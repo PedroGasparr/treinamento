@@ -1,0 +1,205 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true",
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || root.child('users').child(auth.uid).child('isAdmin').val() == true)",
+        ".write": "auth != null && (auth.uid == $uid || root.child('users').child(auth.uid).child('isAdmin').val() == true)",
+        ".validate": "
+          ((!data.exists() && newData.exists() && auth.uid == $uid) ||
+          (root.child('users').child(auth.uid).child('isAdmin').val() == true)) &&
+          newData.hasChildren(['nome', 'email', 'unidade']) &&
+          newData.child('nome').isString() &&
+          newData.child('email').isString() &&
+          newData.child('email').val().matches(/^[^@]+@[^@]+\\.[^@]+$/) &&
+          (
+            newData.child('unidade').val() == 'ADM-MTZ-MCZ' ||
+            newData.child('unidade').val() == 'CD-SZL-SZN' ||
+            newData.child('unidade').val() == 'CD-SZN-CAS' ||
+            newData.child('unidade').val() == 'CD-SZN-CCA' ||
+            newData.child('unidade').val() == 'CD-SZN-MCW' ||
+            newData.child('unidade').val() == 'CD-SZN-SEA' ||
+            newData.child('unidade').val() == 'CD-SZN-SJP' ||
+            newData.child('unidade').val() == 'CD-SZN-SZN' ||
+            newData.child('unidade').val() == 'CD-TRI-GRU' ||
+            newData.child('unidade').val() == 'CD-TZK-SZN' ||
+            newData.child('unidade').val() == 'CD-YHM-SP' ||
+            newData.child('unidade').val() == 'CLIENTE MUNKSJO' ||
+            newData.child('unidade').val() == 'F-AST-JCI' ||
+            newData.child('unidade').val() == 'F-BTK-SRQ' ||
+            newData.child('unidade').val() == 'F-IBM-EMB' ||
+            newData.child('unidade').val() == 'F-IMS-CIM' ||
+            newData.child('unidade').val() == 'F-IMS-LRA' ||
+            newData.child('unidade').val() == 'F-IMS-MCZ' ||
+            newData.child('unidade').val() == 'F-JD-CAS' ||
+            newData.child('unidade').val() == 'F-JD-CTL' ||
+            newData.child('unidade').val() == 'F-JD-HZA' ||
+            newData.child('unidade').val() == 'F-JD-MGO' ||
+            newData.child('unidade').val() == 'F-JDBZ-IDU' ||
+            newData.child('unidade').val() == 'F-JDHB-IDU' ||
+            newData.child('unidade').val() == 'F-NTR-MCZ' ||
+            newData.child('unidade').val() == 'F-OJI-PAA' ||
+            newData.child('unidade').val() == 'F-OJI-RCA' ||
+            newData.child('unidade').val() == 'F-PCO-FSA' ||
+            newData.child('unidade').val() == 'F-PCO-MCZ' ||
+            newData.child('unidade').val() == 'F-SRV-SZN' ||
+            newData.child('unidade').val() == 'F-SZN-ACZ' ||
+            newData.child('unidade').val() == 'F-SZN-BLM' ||
+            newData.child('unidade').val() == 'F-SZN-CPO' ||
+            newData.child('unidade').val() == 'F-SZN-IMP' ||
+            newData.child('unidade').val() == 'F-SZN-JCI' ||
+            newData.child('unidade').val() == 'F-SZN-LRA' ||
+            newData.child('unidade').val() == 'F-SZN-MCW' ||
+            newData.child('unidade').val() == 'F-SZN-SZN' ||
+            newData.child('unidade').val() == 'F-WBR-CAR' ||
+            newData.child('unidade').val() == 'F-WBR-JAD' ||
+            newData.child('unidade').val() == 'F-WBR-MCZ' ||
+            newData.child('unidade').val() == 'F-WTM-JCI' ||
+            newData.child('unidade').val() == 'ITM-SP' ||
+            newData.child('unidade').val() == 'JSL - ARAUCARIA' ||
+            newData.child('unidade').val() == 'JSL - CAPUAVA' ||
+            newData.child('unidade').val() == 'JSL - VOLTA REDONDA' ||
+            newData.child('unidade').val() == 'LIMEIRA - CLIENTE'
+          ) &&
+          (newData.hasChild('cpf') == false || 
+           (newData.child('cpf').isString() && newData.child('cpf').val().matches(/^U2FsdGVkX1.*$/))) &&
+          (newData.hasChild('rg') == false || 
+           (newData.child('rg').isString() && newData.child('rg').val().matches(/^U2FsdGVkX1.*$/))) &&
+          (newData.hasChild('isAdmin') == false || 
+           (newData.child('isAdmin').isBoolean() && root.child('users').child(auth.uid).child('isAdmin').val() == true))
+        ",
+        "documents": {
+          ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true",
+          ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true",
+          ".validate": "
+            newData.hasChildren(['fileName', 'type', 'size', 'data']) &&
+            newData.child('fileName').isString() &&
+            newData.child('type').isString() &&
+            (
+              newData.child('type').val() == 'application/pdf' ||
+              newData.child('type').val() == 'image/jpeg' ||
+              newData.child('type').val() == 'image/png'
+            ) &&
+            newData.child('size').isNumber() &&
+            newData.child('size').val() <= 5242880 &&
+            newData.child('data').isString()
+          "
+        }
+      }
+    },
+    "trainings": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true",
+      "$trainingId": {
+        ".write": "
+          auth != null &&
+          (
+            root.child('users').child(auth.uid).child('isAdmin').val() == true ||
+            (newData.exists() && newData.child('updatedBy').val() == auth.uid) ||
+            (newData.exists() && newData.hasChild('allowedEditors') && 
+             newData.child('allowedEditors').child(root.child('users').child(auth.uid).child('email').val().replace('.', ',')).val() == true) ||
+            (data.exists() && data.hasChild('allowedEditors') && 
+             data.child('allowedEditors').child(root.child('users').child(auth.uid).child('email').val().replace('.', ',')).val() == true)
+          )",
+        ".validate": "
+          newData.hasChildren(['name', 'code', 'status', 'videos', 'questions', 'allowedEditors']) &&
+          newData.child('name').isString() &&
+          newData.child('code').isString() &&
+          newData.child('status').isString() &&
+          (newData.child('status').val() == 'active' || newData.child('status').val() == 'inactive') &&
+          newData.child('videos').hasChildren() &&
+          newData.child('questions').hasChildren() &&
+          newData.child('allowedEditors').hasChildren()
+        "
+      }
+    },
+    "funcoes_por_unidade": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true",
+      "$functionId": {
+        ".validate": "
+          newData.hasChildren(['name', 'unidade']) &&
+          newData.child('name').isString() &&
+          newData.child('unidade').isString() &&
+          (
+            newData.child('unidade').val() == 'ADM-MTZ-MCZ' ||
+            newData.child('unidade').val() == 'CD-SZL-SZN' ||
+            newData.child('unidade').val() == 'CD-SZN-CAS' ||
+            newData.child('unidade').val() == 'CD-SZN-CCA' ||
+            newData.child('unidade').val() == 'CD-SZN-MCW' ||
+            newData.child('unidade').val() == 'CD-SZN-SEA' ||
+            newData.child('unidade').val() == 'CD-SZN-SJP' ||
+            newData.child('unidade').val() == 'CD-SZN-SZN' ||
+            newData.child('unidade').val() == 'CD-TRI-GRU' ||
+            newData.child('unidade').val() == 'CD-TZK-SZN' ||
+            newData.child('unidade').val() == 'CD-YHM-SP' ||
+            newData.child('unidade').val() == 'CLIENTE MUNKSJO' ||
+            newData.child('unidade').val() == 'F-AST-JCI' ||
+            newData.child('unidade').val() == 'F-BTK-SRQ' ||
+            newData.child('unidade').val() == 'F-IBM-EMB' ||
+            newData.child('unidade').val() == 'F-IMS-CIM' ||
+            newData.child('unidade').val() == 'F-IMS-LRA' ||
+            newData.child('unidade').val() == 'F-IMS-MCZ' ||
+            newData.child('unidade').val() == 'F-JD-CAS' ||
+            newData.child('unidade').val() == 'F-JD-CTL' ||
+            newData.child('unidade').val() == 'F-JD-HZA' ||
+            newData.child('unidade').val() == 'F-JD-MGO' ||
+            newData.child('unidade').val() == 'F-JDBZ-IDU' ||
+            newData.child('unidade').val() == 'F-JDHB-IDU' ||
+            newData.child('unidade').val() == 'F-NTR-MCZ' ||
+            newData.child('unidade').val() == 'F-OJI-PAA' ||
+            newData.child('unidade').val() == 'F-OJI-RCA' ||
+            newData.child('unidade').val() == 'F-PCO-FSA' ||
+            newData.child('unidade').val() == 'F-PCO-MCZ' ||
+            newData.child('unidade').val() == 'F-SRV-SZN' ||
+            newData.child('unidade').val() == 'F-SZN-ACZ' ||
+            newData.child('unidade').val() == 'F-SZN-BLM' ||
+            newData.child('unidade').val() == 'F-SZN-CPO' ||
+            newData.child('unidade').val() == 'F-SZN-IMP' ||
+            newData.child('unidade').val() == 'F-SZN-JCI' ||
+            newData.child('unidade').val() == 'F-SZN-LRA' ||
+            newData.child('unidade').val() == 'F-SZN-MCW' ||
+            newData.child('unidade').val() == 'F-SZN-SZN' ||
+            newData.child('unidade').val() == 'F-WBR-CAR' ||
+            newData.child('unidade').val() == 'F-WBR-JAD' ||
+            newData.child('unidade').val() == 'F-WBR-MCZ' ||
+            newData.child('unidade').val() == 'F-WTM-JCI' ||
+            newData.child('unidade').val() == 'ITM-SP' ||
+            newData.child('unidade').val() == 'JSL - ARAUCARIA' ||
+            newData.child('unidade').val() == 'JSL - CAPUAVA' ||
+            newData.child('unidade').val() == 'JSL - VOLTA REDONDA' ||
+            newData.child('unidade').val() == 'LIMEIRA - CLIENTE'
+          )
+        "
+      }
+    },
+    "userTrainings": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid == $userId || root.child('users').child(auth.uid).child('isAdmin').val() == true)",
+        ".write": "auth != null && auth.uid == $userId",
+        "$trainingId": {
+          ".validate": "
+            newData.hasChildren(['status', 'progress']) &&
+            newData.child('status').isString() &&
+            (
+              newData.child('status').val() == 'in_progress' ||
+              newData.child('status').val() == 'completed' ||
+              newData.child('status').val() == 'failed'
+            ) &&
+            newData.child('progress').isNumber() &&
+            newData.child('progress').val() >= 0 &&
+            newData.child('progress').val() <= 100
+          "
+        }
+      }
+    },
+    "public": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true"
+    },
+    "audit_logs": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() == true",
+      ".write": "auth != null"
+    }
+  }
+}

@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <title>Admin - Gerenciar Usuários</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="./CSS/perfil.css">
+    <style>
+        /* Estilos adicionais para a tela de admin */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-container .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .search-container select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 200px;
+        }
+        
+        .search-container button {
+            padding: 10px 15px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            height: 40px;
+        }
+        
+        .users-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-item.without-position {
+            border-left: 4px solid #ff9800;
+            background-color: #fff8e1;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-actions button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .user-actions button.edit-btn {
+            background-color: #34a853;
+        }
+        
+        .user-actions button.delete-btn {
+            background-color: #ea4335;
+        }
+        
+        .admin-form-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: none;
+        }
+        
+        .admin-form-container h2 {
+            margin-top: 0;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .form-actions button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .form-actions .save-btn {
+            background-color: #34a853;
+            color: white;
+        }
+        
+        .form-actions .cancel-btn {
+            background-color: #f1f1f1;
+        }
+        
+        .position-warning {
+            color: #ff9800;
+            font-size: 12px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .position-warning i {
+            margin-right: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-grid div {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GZL Treinamentos</h2>
+            <p>Bem-vindo, <span id="userName"></span></p>
+        </div>
+        <ul class="sidebar-menu">
+            <li id="menuHome">
+                <i class="material-icons">home</i> Home
+            </li>
+            <li id="menuEmployees" class="active">
+                <i class="material-icons">people</i> Funcionários
+            </li>
+            <li id="menuTrainings">
+                <i class="material-icons">school</i> Treinamentos
+            </li>
+            <li id="menuProfile">
+                <i class="material-icons">person</i> Perfil
+            </li>
+            <li id="menuLogout">
+                <i class="material-icons">logout</i> Sair
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="admin-container">
+            <h1>Gerenciamento de Usuários</h1>
+            
+            <div class="search-container">
+                <div class="search-input">
+                    <input type="text" id="searchUser" placeholder="Pesquisar por nome ou email...">
+                </div>
+                <div>
+                    <select id="searchUnit">
+                        <option value="">Todas as unidades</option>
+                        <!-- As opções serão preenchidas dinamicamente -->
+                    </select>
+                </div>
+                <div>
+                    <select id="searchPosition">
+                        <option value="">Todos os cargos</option>
+                        <option value="WITHOUT_POSITION">Sem cargo definido</option>
+                        <!-- As opções serão preenchidas dinamicamente -->
+                    </select>
+                </div>
+                <button id="searchButton">
+                    <i class="material-icons">search</i> Pesquisar
+                </button>
+            </div>
+            
+            <div class="users-list" id="usersList">
+                <!-- Lista de usuários será preenchida dinamicamente -->
+                <div class="loading-message">Carregando usuários...</div>
+            </div>
+            
+            <div class="admin-form-container" id="adminForm">
+                <h2>Editar Usuário</h2>
+                
+                <div class="profile-info">
+                    <div class="info-grid">
+                        <div>
+                            <p><strong>Nome Completo:</strong></p>
+                            <input type="text" id="adminFullName" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <p><strong>Data de Nascimento:</strong></p>
+                            <input type="date" id="adminBirthDate">
+                        </div>
+                        <div>
+                            <p><strong>CPF:</strong></p>
+                            <input type="text" id="adminCpf" placeholder="000.000.000-00">
+                        </div>
+                        <div>
+                            <p><strong>RG:</strong></p>
+                            <input type="text" id="adminRg" placeholder="00.000.000-0">
+                        </div>
+                        <div>
+                            <p><strong>Unidade:</strong></p>
+                            <select id="adminUnit">
+                                <!-- As opções serão preenchidas dinamicamente -->
+                            </select>
+                        </div>
+                        <div>
+                            <p><strong>Cargo:</strong></p>
+                            <select id="adminPosition">
+                                <option value="">Selecione um cargo</option>
+                                <!-- As opções serão preenchidas dinamicamente -->
+                            </select>
+                        </div>
+                        <div>
+                            <p><strong>Email:</strong></p>
+                            <input type="email" id="adminEmail" disabled>
+                        </div>
+                    </div>
+                    
+                    <h2>Documentos</h2>
+                    <div class="documents-section">
+                        <div class="document-upload">
+                            <label>Carteira de Trabalho:</label>
+                            <div class="upload-wrapper">
+                                <span id="adminDoc1Status" class="document-status status-pending">Não verificado</span>
+                            </div>
+                            <div id="adminDoc1Info" class="file-info"></div>
+                        </div>
+                        <div class="document-upload">
+                            <label>Comprovante de Residência:</label>
+                            <div class="upload-wrapper">
+                                <span id="adminDoc2Status" class="document-status status-pending">Não verificado</span>
+                            </div>
+                            <div id="adminDoc2Info" class="file-info"></div>
+                        </div>
+                        <div class="document-upload">
+                            <label>Certificado de Reservista:</label>
+                            <div class="upload-wrapper">
+                                <span id="adminDoc3Status" class="document-status status-pending">Não verificado</span>
+                            </div>
+                            <div id="adminDoc3Info" class="file-info"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="cancel-btn" id="cancelEdit">
+                            <i class="material-icons">cancel</i> Cancelar
+                        </button>
+                        <button class="save-btn" id="saveUser">
+                            <i class="material-icons">save</i> Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G"
+        };
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        let currentUser = null;
+        let currentEditingUserId = null;
+        let positionsList = [];
+        let unitsList = [];
+
+        // Monitora o estado de autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+                loadPositions();
+                loadUnits();
+                loadAllUsers();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Carrega a lista de unidades do banco de dados
+        function loadUnits() {
+            database.ref('funcoes_por_unidade').once('value').then((snapshot) => {
+                const unitsData = snapshot.val();
+                unitsList = [];
+                
+                // Extrai unidades únicas dos funcionários
+                const uniqueUnits = new Set();
+                
+                if (unitsData) {
+                    for (const funcId in unitsData) {
+                        const func = unitsData[funcId];
+                        if (func.unidade) {
+                            uniqueUnits.add(func.unidade);
+                        }
+                    }
+                }
+                
+                // Converte o Set para array e ordena
+                unitsList = Array.from(uniqueUnits).sort();
+                
+                // Atualiza os selects de unidade
+                updateUnitSelects();
+                
+            }).catch((error) => {
+                console.error("Erro ao carregar unidades:", error);
+            });
+        }
+
+        // Atualiza os selects de unidade na interface
+        function updateUnitSelects() {
+            const searchUnitSelect = document.getElementById('searchUnit');
+            const adminUnitSelect = document.getElementById('adminUnit');
+            
+            // Limpa os selects
+            searchUnitSelect.innerHTML = '<option value="">Todas as unidades</option>';
+            adminUnitSelect.innerHTML = '<option value="">Selecione uma unidade</option>';
+            
+            // Adiciona as unidades aos selects
+            unitsList.forEach(unit => {
+                const searchOption = new Option(unit, unit);
+                searchUnitSelect.add(searchOption);
+                
+                const adminOption = new Option(unit, unit);
+                adminUnitSelect.add(adminOption);
+            });
+            
+            // Adiciona evento de change para o select de unidade no formulário
+            adminUnitSelect.addEventListener('change', function() {
+                updatePositionOptionsBasedOnUnit(this.value);
+            });
+        }
+
+        // Atualiza as opções de cargo com base na unidade selecionada
+        function updatePositionOptionsBasedOnUnit(selectedUnit) {
+            const positionSelect = document.getElementById('adminPosition');
+            
+            // Limpa as opções existentes, mantendo apenas a primeira opção padrão
+            positionSelect.innerHTML = '<option value="">Selecione um cargo</option>';
+            
+            if (!selectedUnit) {
+                // Se nenhuma unidade foi selecionada, mostra todos os cargos
+                positionsList.forEach(position => {
+                    const option = new Option(position.name, position.id);
+                    positionSelect.add(option);
+                });
+                return;
+            }
+            
+            // Filtra os cargos pela unidade selecionada
+            const filteredPositions = positionsList.filter(position => position.unidade === selectedUnit);
+            
+            if (filteredPositions.length === 0) {
+                // Se não houver cargos para a unidade selecionada
+                positionSelect.innerHTML = '<option value="">Nenhum cargo disponível para esta unidade</option>';
+                return;
+            }
+            
+            // Adiciona os cargos filtrados ao select
+            filteredPositions.forEach(position => {
+                const option = new Option(position.name, position.id);
+                positionSelect.add(option);
+            });
+        }
+
+        // Carrega a lista de cargos disponíveis
+        function loadPositions() {
+            database.ref('funcoes_por_unidade').once('value').then((snapshot) => {
+                const functionsData = snapshot.val();
+                positionsList = [];
+                
+                if (functionsData) {
+                    for (const funcId in functionsData) {
+                        const func = functionsData[funcId];
+                        positionsList.push({
+                            id: funcId,
+                            name: func.name,
+                            unidade: func.unidade
+                        });
+                    }
+                }
+                
+                // Atualiza os selects de cargo
+                updatePositionSelects();
+                
+            }).catch((error) => {
+                console.error("Erro ao carregar cargos:", error);
+            });
+        }
+
+        // Atualiza os selects de cargo na interface
+        function updatePositionSelects() {
+            const searchPositionSelect = document.getElementById('searchPosition');
+            
+            // Limpa as opções existentes
+            searchPositionSelect.innerHTML = '<option value="">Todos os cargos</option><option value="WITHOUT_POSITION">Sem cargo definido</option>';
+            
+            // Adiciona os cargos ao select de busca
+            positionsList.forEach(position => {
+                const searchOption = new Option(position.name, position.id);
+                searchPositionSelect.add(searchOption);
+            });
+        }
+
+        // Carrega todos os usuários com filtros
+        function loadAllUsers(searchTerm = '', unitFilter = '', positionFilter = '') {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '<div class="loading-message">Carregando usuários...</div>';
+            
+            database.ref('users').once('value').then((snapshot) => {
+                const users = snapshot.val();
+                usersList.innerHTML = '';
+                
+                if (!users) {
+                    usersList.innerHTML = '<div class="no-users">Nenhum usuário encontrado</div>';
+                    return;
+                }
+                
+                let hasResults = false;
+                const userItems = [];
+                
+                for (const userId in users) {
+                    const user = users[userId];
+                    const email = user.email || userId;
+                    const nome = user.nome || 'Nome não informado';
+                    const unidade = user.unidade || '';
+                    const positionId = user.position || '';
+                    const positionData = positionsList.find(p => p.id === positionId);
+                    const positionName = positionData ? positionData.name : '';
+                    
+                    // Filtra por termo de pesquisa, unidade e cargo
+                    const matchesSearch = !searchTerm || 
+                        nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                        email.toLowerCase().includes(searchTerm.toLowerCase());
+                    
+                    const matchesUnit = !unitFilter || unidade === unitFilter;
+                    
+                    let matchesPosition = true;
+                    if (positionFilter === 'WITHOUT_POSITION') {
+                        matchesPosition = !positionId;
+                    } else if (positionFilter) {
+                        matchesPosition = positionId === positionFilter;
+                    }
+                    
+                    if (!matchesSearch || !matchesUnit || !matchesPosition) continue;
+                    
+                    hasResults = true;
+                    
+                    // Verifica se o usuário não tem cargo definido
+                    const hasNoPosition = !positionId;
+                    
+                    userItems.push(`
+                        <div class="user-item ${hasNoPosition ? 'without-position' : ''}">
+                            <div class="user-info">
+                                <h3>${nome}</h3>
+                                <p>${email}</p>
+                                <p>Unidade: ${unidade || 'Não informada'}</p>
+                                ${positionName ? `<p>Cargo: ${positionName}</p>` : ''}
+                                ${hasNoPosition ? `
+                                    <div class="position-warning">
+                                        <i class="material-icons">warning</i>
+                                        Este funcionário não tem cargo definido
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="user-actions">
+                                <button class="edit-btn" data-userid="${userId}">
+                                    <i class="material-icons">edit</i> Editar
+                                </button>
+                            </div>
+                        </div>
+                    `);
+                }
+                
+                if (!hasResults) {
+                    usersList.innerHTML = '<div class="no-users">Nenhum usuário encontrado</div>';
+                } else {
+                    usersList.innerHTML = userItems.join('');
+                    setupEditButtons();
+                }
+            }).catch((error) => {
+                console.error("Erro ao carregar usuários:", error);
+                usersList.innerHTML = '<div class="error-message">Erro ao carregar usuários</div>';
+            });
+        }
+
+        // Configura os botões de edição
+        function setupEditButtons() {
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-userid');
+                    editUser(userId);
+                });
+            });
+        }
+
+        // Edita um usuário específico
+        async function editUser(userId) {
+            try {
+                currentEditingUserId = userId;
+                resetForm();
+                document.getElementById('adminForm').style.display = 'block';
+                
+                const snapshot = await database.ref(`users/${userId}`).once('value');
+                const userData = snapshot.val();
+                
+                if (!userData) throw new Error('Dados do usuário não encontrados');
+                
+                // Preenche os campos
+                document.getElementById('adminFullName').value = userData.nome || '';
+                document.getElementById('adminBirthDate').value = userData.dataNascimento || '';
+                document.getElementById('adminEmail').value = userData.email || userId;
+                document.getElementById('adminCpf').value = userData.cpf || '';
+                document.getElementById('adminRg').value = userData.rg || '';
+                
+                if (userData.unidade) {
+                    document.getElementById('adminUnit').value = userData.unidade;
+                    // Atualiza as opções de cargo com base na unidade selecionada
+                    updatePositionOptionsBasedOnUnit(userData.unidade);
+                    
+                    // Define o cargo do usuário após atualizar as opções
+                    if (userData.position) {
+                        // Usamos setTimeout para garantir que as opções foram atualizadas
+                        setTimeout(() => {
+                            document.getElementById('adminPosition').value = userData.position;
+                        }, 100);
+                    }
+                }
+                
+                // Aplica máscaras
+                setupMasks();
+                
+                // Carrega documentos
+                await loadUserDocuments(userId);
+                
+            } catch (error) {
+                console.error("Erro ao editar usuário:", error);
+                alert(`Erro ao carregar dados do usuário: ${error.message || 'Tente novamente'}`);
+                document.getElementById('adminForm').style.display = 'none';
+            }
+        }
+
+        // Configura máscaras para CPF e RG
+        function setupMasks() {
+            const cpfField = document.getElementById('adminCpf');
+            const rgField = document.getElementById('adminRg');
+            
+            if (cpfField) {
+                cpfField.addEventListener('input', formatCPF);
+            }
+            
+            if (rgField) {
+                rgField.addEventListener('input', formatRG);
+            }
+        }
+
+        // Formata CPF
+        function formatCPF(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        }
+
+        // Formata RG
+        function formatRG(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{2})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1})$/, '$1-$2');
+            e.target.value = value;
+        }
+
+        // Função para resetar o formulário
+        function resetForm() {
+            const fields = [
+                'adminFullName', 'adminBirthDate', 'adminCpf', 
+                'adminRg', 'adminUnit', 'adminEmail', 'adminPosition'
+            ];
+            
+            fields.forEach(id => {
+                const field = document.getElementById(id);
+                if (field) field.value = '';
+            });
+            
+            ['adminDoc1', 'adminDoc2', 'adminDoc3'].forEach(docId => {
+                resetDocumentUI(docId);
+            });
+        }
+
+        // Função para resetar a UI dos documentos
+        function resetDocumentUI(docId) {
+            const statusElement = document.getElementById(`${docId}Status`);
+            const infoElement = document.getElementById(`${docId}Info`);
+            
+            if (statusElement) {
+                statusElement.textContent = "Carregando...";
+                statusElement.className = "document-status status-pending";
+            }
+            
+            if (infoElement) {
+                infoElement.textContent = "";
+            }
+        }
+
+        // Carrega os documentos do usuário
+        async function loadUserDocuments(userId) {
+            try {
+                const snapshot = await database.ref(`users/${userId}/documents`).once('value');
+                const documents = snapshot.val() || {};
+                
+                updateAdminDocumentUI('adminDoc1', documents.carteiraTrabalho);
+                updateAdminDocumentUI('adminDoc2', documents.comprovanteResidencia);
+                updateAdminDocumentUI('adminDoc3', documents.certificadoReservista);
+                
+            } catch (error) {
+                console.error("Erro ao carregar documentos:", error);
+            }
+        }
+
+        // Atualiza a UI dos documentos
+        function updateAdminDocumentUI(docId, docData) {
+            const statusElement = document.getElementById(`${docId}Status`);
+            const infoElement = document.getElementById(`${docId}Info`);
+            
+            if (!statusElement || !infoElement) return;
+            
+            if (!docData) {
+                statusElement.textContent = "Não enviado";
+                statusElement.className = "document-status status-pending";
+                infoElement.textContent = "";
+                return;
+            }
+            
+            statusElement.textContent = "Enviado";
+            statusElement.className = "document-status status-uploaded";
+            
+            if (docData.fileName) {
+                infoElement.textContent = `${docData.fileName} (${formatFileSize(docData.size)})`;
+            } else {
+                infoElement.textContent = "Documento enviado";
+            }
+        }
+
+        // Formata o tamanho do arquivo
+        function formatFileSize(bytes) {
+            if (!bytes) return "0 Bytes";
+            const k = 1024;
+            const sizes = ["Bytes", "KB", "MB", "GB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+        }
+
+        // Salva as alterações do usuário
+        document.getElementById('saveUser').addEventListener('click', async function() {
+            if (!currentEditingUserId) return;
+            
+            const userData = {
+                nome: document.getElementById('adminFullName').value,
+                dataNascimento: document.getElementById('adminBirthDate').value,
+                cpf: document.getElementById('adminCpf').value.replace(/\D/g, ''),
+                rg: document.getElementById('adminRg').value.replace(/\D/g, ''),
+                unidade: document.getElementById('adminUnit').value,
+                position: document.getElementById('adminPosition').value,
+                lastUpdate: new Date().toISOString(),
+                updatedBy: currentUser.uid,
+                updatedByEmail: currentUser.email
+            };
+            
+            if (!userData.nome) {
+                alert('Por favor, preencha o nome completo');
+                return;
+            }
+            
+            try {
+                await database.ref(`users/${currentEditingUserId}`).update(userData);
+                alert('Usuário atualizado com sucesso!');
+                
+                // Recarrega com os filtros atuais
+                const searchTerm = document.getElementById('searchUser').value;
+                const unitFilter = document.getElementById('searchUnit').value;
+                const positionFilter = document.getElementById('searchPosition').value;
+                loadAllUsers(searchTerm, unitFilter, positionFilter);
+                
+                cancelEdit();
+                
+            } catch (error) {
+                console.error("Erro ao atualizar usuário:", error);
+                alert('Erro ao salvar alterações: ' + error.message);
+            }
+        });
+
+        // Cancela a edição
+        document.getElementById('cancelEdit').addEventListener('click', cancelEdit);
+        
+        function cancelEdit() {
+            currentEditingUserId = null;
+            document.getElementById('adminForm').style.display = 'none';
+        }
+
+        // Pesquisa usuários
+        function performSearch() {
+            const searchTerm = document.getElementById('searchUser').value;
+            const unitFilter = document.getElementById('searchUnit').value;
+            const positionFilter = document.getElementById('searchPosition').value;
+            loadAllUsers(searchTerm, unitFilter, positionFilter);
+        }
+        
+        // Event listeners
+        document.getElementById('searchButton').addEventListener('click', performSearch);
+        document.getElementById('searchUser').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+        document.getElementById('searchUnit').addEventListener('change', performSearch);
+        document.getElementById('searchPosition').addEventListener('change', performSearch);
+
+        // Navegação do menu - Atualizado com prevenção de comportamento padrão
+        document.getElementById('menuHome').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'home.html';
+        });
+        
+        document.getElementById('menuTrainings').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'trinametoadm.html';
+        });
+        
+        document.getElementById('menuEmployees').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'admin.html';
+        });
+        
+        document.getElementById('menuProfile').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'perfiladm.html';
+        });
+        
+        document.getElementById('menuLogout').addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error("Erro ao fazer logout:", error);
+            });
+        });
+
+        // Inicializa máscaras quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', setupMasks);
+    </script>
+</body>
+</html>

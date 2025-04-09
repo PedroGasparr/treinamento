@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - GZL Treinamentos</title>
+    <link rel="stylesheet" href="./CSS/style.css">
+    <!-- Firebase SDK (modular version) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+        
+        // Sua configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const provider = new GoogleAuthProvider();
+
+        // Disponibiliza para o script.js
+        window.firebase = {
+            auth,
+            database,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            signInWithPopup,
+            provider,
+            ref,
+            set
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="form-container sign-in-container">
+            <form id="signInForm">
+                <h1>Entrar</h1>
+                <div class="social-container">
+                    <div class="social" id="googleSignIn">
+                        <img src="./img/iconGoogle.png" alt="Google">
+                    </div>
+                </div>
+                <span>ou use sua conta</span>
+                <input type="email" id="loginEmail" placeholder="Email" required />
+                <input type="password" id="loginPassword" placeholder="Senha" required />
+                <a href="#" id="forgotPassword">Esqueceu sua senha?</a>
+                <button type="submit">Entrar</button>
+            </form>
+        </div>
+        <div class="form-container sign-up-container">
+            <form id="signUpForm">
+                <h1>Criar Conta</h1>
+                <input type="text" id="signUpName" placeholder="Nome Completo" required />
+                <input type="email" id="signUpEmail" placeholder="Email" required />
+                <input type="password" id="signUpPassword" placeholder="Senha" required />
+                <input type="date" id="signUpBirthdate" required />
+                <select id="signUpUnit" required>
+                    <option value="" disabled selected>Selecione sua unidade</option>
+                    <option value="ADM-MTZ-MCZ">ADM-MTZ-MCZ</option>
+                    <option value="CD-SZL-SZN">CD-SZL-SZN</option>
+                    <option value="CD-SZN-CAS">CD-SZN-CAS</option>
+                    <option value="CD-SZN-CCA">CD-SZN-CCA</option>
+                    <option value="CD-SZN-MCW">CD-SZN-MCW</option>
+                    <option value="CD-SZN-SEA">CD-SZN-SEA</option>
+                    <option value="CD-SZN-SJP">CD-SZN-SJP</option>
+                    <option value="CD-SZN-SZN">CD-SZN-SZN</option>
+                    <option value="CD-TRI-GRU">CD-TRI-GRU</option>
+                    <option value="CD-TZK-SZN">CD-TZK-SZN</option>
+                    <option value="CD-YHM-SP">CD-YHM-SP</option>
+                    <option value="CLIENTE MUNKSJO">CLIENTE MUNKSJO</option>
+                    <option value="F-AST-JCI">F-AST-JCI</option>
+                    <option value="F-BTK-SRQ">F-BTK-SRQ</option>
+                    <option value="F-IBM-EMB">F-IBM-EMB</option>
+                    <option value="F-IMS-CIM">F-IMS-CIM</option>
+                    <option value="F-IMS-LRA">F-IMS-LRA</option>
+                    <option value="F-IMS-MCZ">F-IMS-MCZ</option>
+                    <option value="F-JD-CAS">F-JD-CAS</option>
+                    <option value="F-JD-CTL">F-JD-CTL</option>
+                    <option value="F-JD-HZA">F-JD-HZA</option>
+                    <option value="F-JD-MGO">F-JD-MGO</option>
+                    <option value="F-JDBZ-IDU">F-JDBZ-IDU</option>
+                    <option value="F-JDHB-IDU">F-JDHB-IDU</option>
+                    <option value="F-NTR-MCZ">F-NTR-MCZ</option>
+                    <option value="F-OJI-PAA">F-OJI-PAA</option>
+                    <option value="F-OJI-RCA">F-OJI-RCA</option>
+                    <option value="F-PCO-FSA">F-PCO-FSA</option>
+                    <option value="F-PCO-MCZ">F-PCO-MCZ</option>
+                    <option value="F-SRV-SZN">F-SRV-SZN</option>
+                    <option value="F-SZN-ACZ">F-SZN-ACZ</option>
+                    <option value="F-SZN-BLM">F-SZN-BLM</option>
+                    <option value="F-SZN-CPO">F-SZN-CPO</option>
+                    <option value="F-SZN-IMP">F-SZN-IMP</option>
+                    <option value="F-SZN-JCI">F-SZN-JCI</option>
+                    <option value="F-SZN-LRA">F-SZN-LRA</option>
+                    <option value="F-SZN-MCW">F-SZN-MCW</option>
+                    <option value="F-SZN-SZN">F-SZN-SZN</option>
+                    <option value="F-WBR-CAR">F-WBR-CAR</option>
+                    <option value="F-WBR-JAD">F-WBR-JAD</option>
+                    <option value="F-WBR-MCZ">F-WBR-MCZ</option>
+                    <option value="F-WTM-JCI">F-WTM-JCI</option>
+                    <option value="ITM-SP">ITM-SP</option>
+                    <option value="JSL - ARAUCARIA">JSL - ARAUCARIA</option>
+                    <option value="JSL - CAPUAVA">JSL - CAPUAVA</option>
+                    <option value="JSL - VOLTA REDONDA">JSL - VOLTA REDONDA</option>
+                    <option value="LIMEIRA - CLIENTE">LIMEIRA - CLIENTE</option>
+                </select>
+                <button type="submit">Cadastrar</button>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Já tem uma conta?</h1>
+                    <p>Faça login com seus dados pessoais</p>
+                    <button class="ghost" id="signIn">Entrar</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Novo aqui?</h1>
+                    <p>Cadastre-se e comece sua jornada conosco</p>
+                    <button class="ghost" id="signUp">Criar Conta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./JS/login.js"></script>
+    <script src="./JS/script.js"></script>
+</body>
+</html>

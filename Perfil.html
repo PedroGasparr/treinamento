@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - GZL Treinamentos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="./CSS/perfil.css">
+    <!-- Adicionando CryptoJS para criptografia -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GZL Treinamentos</h2>
+            <p>Bem-vindo, <span id="userName"></span></p>
+        </div>
+        <ul class="sidebar-menu">
+            <li id="menuHome">
+                <i class="material-icons">home</i> Home
+            </li>
+            <li class="active" id="menuProfile">
+                <i class="material-icons">person</i> Perfil
+            </li>
+            <li id="menuCompleted">
+                <i class="material-icons">check_circle</i> Concluídos
+            </li>
+            <li id="menuLogout">
+                <i class="material-icons">logout</i> Sair
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="profile-container">
+            <h1>Meu Perfil</h1>
+            
+            <div class="profile-section">
+                <div class="profile-picture">
+                    <img id="profilePic" src="./img/default-profile.png" alt="Foto de Perfil">
+                    <div class="upload-controls">
+                        <input type="file" id="uploadPhoto" accept="image/*">
+                        <label for="uploadPhoto" class="upload-label">
+                            <i class="material-icons">camera_alt</i> Alterar Foto
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="profile-info">
+                    <h2>Informações Pessoais</h2>
+                    <div class="info-grid">
+                        <div>
+                            <p><strong>Nome Completo:</strong></p>
+                            <input type="text" id="fullName" placeholder="Seu nome completo">
+                        </div>
+                        <div>
+                            <p><strong>Data de Nascimento:</strong></p>
+                            <input type="date" id="birthDate">
+                        </div>
+                        <div>
+                            <p><strong>CPF:</strong></p>
+                            <input type="text" id="cpf" placeholder="000.000.000-00">
+                        </div>
+                        <div>
+                            <p><strong>RG:</strong></p>
+                            <input type="text" id="rg" placeholder="00.000.000-0">
+                        </div>
+                        <div>
+                            <p><strong>Unidade:</strong></p>
+                            <input type="text" id="unit" disabled>
+                        </div>
+                        <div>
+                            <p><strong>Email:</strong></p>
+                            <input type="email" id="email" disabled>
+                        </div>
+                    </div>
+                    
+                    <h2>Documentos</h2>
+                    <div class="documents-section">
+                        <div class="document-upload">
+                            <label for="uploadDocument1">Carteira de Trabalho:</label>
+                            <div class="upload-wrapper">
+                                <button class="custom-upload-button">Selecionar Arquivo</button>
+                                <input type="file" id="uploadDocument1" accept=".pdf,.jpg,.jpeg,.png">
+                                <span id="document1Status" class="document-status status-pending">Não enviado</span>
+                            </div>
+                            <div id="document1Info" class="file-info"></div>
+                        </div>
+                        <div class="document-upload">
+                            <label for="uploadDocument2">Comprovante de Residência:</label>
+                            <div class="upload-wrapper">
+                                <button class="custom-upload-button">Selecionar Arquivo</button>
+                                <input type="file" id="uploadDocument2" accept=".pdf,.jpg,.jpeg,.png">
+                                <span id="document2Status" class="document-status status-pending">Não enviado</span>
+                            </div>
+                            <div id="document2Info" class="file-info"></div>
+                        </div>
+                        <div class="document-upload">
+                            <label for="uploadDocument3">Certificado de Reservista:</label>
+                            <div class="upload-wrapper">
+                                <button class="custom-upload-button">Selecionar Arquivo</button>
+                                <input type="file" id="uploadDocument3" accept=".pdf,.jpg,.jpeg,.png">
+                                <span id="document3Status" class="document-status status-pending">Não enviado</span>
+                            </div>
+                            <div id="document3Info" class="file-info"></div>
+                        </div>
+                    </div>
+                    
+                    <button id="saveProfile" class="save-button">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G"
+        };
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        const storage = firebase.storage();
+        let currentUser = null;
+
+        // Chave secreta para criptografia (em produção, isso deve ser armazenado de forma mais segura)
+        const ENCRYPTION_KEY = "GZL_Treinamentos_2023_Seguranca!";
+
+        // Função para criptografar dados
+        function encryptData(data) {
+            if (!data) return null;
+            return CryptoJS.AES.encrypt(data, ENCRYPTION_KEY).toString();
+        }
+
+        // Função para descriptografar dados
+        function decryptData(encryptedData) {
+            if (!encryptedData) return null;
+            try {
+                const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY);
+                return bytes.toString(CryptoJS.enc.Utf8);
+            } catch (e) {
+                console.error("Erro ao descriptografar:", e);
+                return null;
+            }
+        }
+
+        // Monitora o estado de autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                loadUserData();
+                loadProfilePicture();
+                loadDocuments();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Carrega os dados do usuário
+        function loadUserData() {
+            const userRef = database.ref(`users/${currentUser.uid}`);
+            userRef.once("value").then((snapshot) => {
+                const userData = snapshot.val();
+                
+                // Atualiza o nome na sidebar
+                if (userData && userData.nome) {
+                    document.getElementById('userName').textContent = userData.nome;
+                } else {
+                    document.getElementById('userName').textContent = currentUser.displayName || currentUser.email.split('@')[0];
+                }
+                
+                // Preenche os campos do formulário
+                if (userData) {
+                    document.getElementById('fullName').value = userData.nome || '';
+                    document.getElementById('birthDate').value = userData.dataNascimento || '';
+                    
+                    // Descriptografa CPF e RG se estiverem criptografados
+                    const cpfValue = (userData.cpf && userData.cpf.startsWith('U2FsdGVkX1')) ? decryptData(userData.cpf) : userData.cpf;
+                    const rgValue = (userData.rg && userData.rg.startsWith('U2FsdGVkX1')) ? decryptData(userData.rg) : userData.rg;
+                    
+                    document.getElementById('cpf').value = cpfValue || '';
+                    document.getElementById('rg').value = rgValue || '';
+                    
+                    // Unidade é apenas leitura e vem do banco
+                    document.getElementById('unit').value = userData.unidade || 'Unidade não definida';
+                    document.getElementById('email').value = currentUser.email;
+                    
+                    // Aplica máscaras
+                    $('#cpf').mask('000.000.000-00');
+                    $('#rg').mask('00.000.000-0');
+                }
+            }).catch((error) => {
+                console.error("Erro ao carregar dados do usuário:", error);
+                document.getElementById('userName').textContent = currentUser.displayName || currentUser.email.split('@')[0];
+            });
+        }
+
+        // Carrega a foto de perfil
+        function loadProfilePicture() {
+            const profilePicRef = database.ref(`users/${currentUser.uid}/profilePic`);
+            profilePicRef.once("value").then((snapshot) => {
+                const photoUrl = snapshot.val();
+                if (photoUrl) {
+                    document.getElementById('profilePic').src = photoUrl;
+                }
+            });
+        }
+
+        // Carrega os documentos existentes
+        function loadDocuments() {
+            const docsRef = database.ref(`users/${currentUser.uid}/documents`);
+            docsRef.once("value").then((snapshot) => {
+                const documents = snapshot.val() || {};
+                
+                // Carteira de Trabalho
+                if (documents.carteiraTrabalho) {
+                    updateDocumentUI('document1', documents.carteiraTrabalho);
+                }
+                
+                // Comprovante de Residência
+                if (documents.comprovanteResidencia) {
+                    updateDocumentUI('document2', documents.comprovanteResidencia);
+                }
+                
+                // Certificado de Reservista
+                if (documents.certificadoReservista) {
+                    updateDocumentUI('document3', documents.certificadoReservista);
+                }
+            });
+        }
+
+        // Atualiza a interface do documento
+        function updateDocumentUI(docId, docData) {
+            const statusElement = document.getElementById(`${docId}Status`);
+            const infoElement = document.getElementById(`${docId}Info`);
+            const buttonElement = document.querySelector(`#upload${docId.charAt(0).toUpperCase() + docId.slice(1)}`).previousElementSibling;
+            
+            statusElement.textContent = "Enviado";
+            statusElement.className = "document-status status-uploaded";
+            buttonElement.textContent = "Alterar Arquivo";
+            
+            if (docData.fileName) {
+                infoElement.textContent = `${docData.fileName} (${formatFileSize(docData.size)})`;
+            } else if (typeof docData === 'string') {
+                // Para compatibilidade com versões antigas que armazenavam apenas a string Base64
+                infoElement.textContent = "Documento enviado";
+            } else {
+                infoElement.textContent = "Documento enviado";
+            }
+        }
+
+        // Formata o tamanho do arquivo
+        function formatFileSize(bytes) {
+            if (!bytes) return "0 Bytes";
+            const k = 1024;
+            const sizes = ["Bytes", "KB", "MB", "GB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+        }
+
+        // Configura o upload da foto de perfil
+        document.getElementById("uploadPhoto").addEventListener("change", async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Valida o arquivo
+            const validTypes = ['image/jpeg', 'image/png'];
+            const maxSize = 2 * 1024 * 1024; // 2MB
+            
+            if (!validTypes.includes(file.type)) {
+                alert('Por favor, selecione uma imagem no formato JPG ou PNG.');
+                return;
+            }
+            
+            if (file.size > maxSize) {
+                alert('A imagem deve ter menos de 2MB.');
+                return;
+            }
+            
+            try {
+                // Converte para Base64
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64String = e.target.result;
+                    document.getElementById('profilePic').src = base64String;
+                    
+                    // Salva no Firebase
+                    database.ref(`users/${currentUser.uid}/profilePic`).set(base64String)
+                        .then(() => alert('Foto atualizada com sucesso!'))
+                        .catch(error => console.error("Erro ao salvar foto:", error));
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error("Erro ao processar imagem:", error);
+                alert('Erro ao processar a imagem. Por favor, tente novamente.');
+            }
+        });
+
+        // Configura o upload de documentos
+        function setupDocumentUpload(inputId, docType) {
+            const inputElement = document.getElementById(inputId);
+            const docId = inputId.replace('upload', '').toLowerCase();
+            
+            inputElement.addEventListener("change", async function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // Valida o arquivo
+                const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                
+                if (!validTypes.includes(file.type)) {
+                    alert('Por favor, selecione um arquivo nos formatos PDF, JPG ou PNG.');
+                    return;
+                }
+                
+                if (file.size > maxSize) {
+                    alert('O documento deve ter menos de 5MB.');
+                    return;
+                }
+                
+                try {
+                    // Atualiza o status para "Enviando..."
+                    const statusElement = document.getElementById(`${docId}Status`);
+                    statusElement.textContent = "Enviando...";
+                    statusElement.className = "document-status status-uploading";
+                    
+                    // Converte para Base64
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const base64String = e.target.result;
+                        
+                        // Prepara os dados do documento
+                        const docData = {
+                            data: base64String,
+                            fileName: file.name,
+                            type: file.type,
+                            size: file.size,
+                            uploadDate: new Date().toISOString()
+                        };
+                        
+                        // Salva no Firebase
+                        await database.ref(`users/${currentUser.uid}/documents/${docType}`).set(docData);
+                        
+                        // Atualiza a UI
+                        updateDocumentUI(docId, docData);
+                        alert('Documento enviado com sucesso!');
+                    };
+                    reader.readAsDataURL(file);
+                } catch (error) {
+                    console.error(`Erro ao enviar ${docType}:`, error);
+                    document.getElementById(`${docId}Status`).textContent = "Erro ao enviar";
+                    document.getElementById(`${docId}Status`).className = "document-status status-pending";
+                    alert('Erro ao enviar documento. Por favor, tente novamente.');
+                }
+            });
+        }
+
+        // Configura os listeners para os documentos
+        setupDocumentUpload('uploadDocument1', 'carteiraTrabalho');
+        setupDocumentUpload('uploadDocument2', 'comprovanteResidencia');
+        setupDocumentUpload('uploadDocument3', 'certificadoReservista');
+
+        // Salva o perfil
+        document.getElementById('saveProfile').addEventListener('click', function() {
+            const userData = {
+                nome: document.getElementById('fullName').value,
+                dataNascimento: document.getElementById('birthDate').value,
+                // Criptografa CPF e RG antes de enviar
+                cpf: encryptData(document.getElementById('cpf').value),
+                rg: encryptData(document.getElementById('rg').value),
+                // Unidade não é enviada pois não pode ser alterada pelo usuário
+                lastUpdate: new Date().toISOString()
+            };
+
+            if (!userData.nome) {
+                alert('Por favor, preencha seu nome completo');
+                return;
+            }
+
+            database.ref(`users/${currentUser.uid}`).update(userData)
+                .then(() => {
+                    alert('Perfil atualizado com sucesso!');
+                    document.getElementById('userName').textContent = userData.nome;
+                })
+                .catch(error => {
+                    console.error("Erro ao atualizar perfil:", error);
+                    alert('Erro ao salvar perfil: ' + error.message);
+                });
+        });
+
+        // Navegação
+        document.getElementById('menuHome').addEventListener('click', () => {
+            window.location.href = 'home.html';
+        });
+        
+        document.getElementById('menuCompleted').addEventListener('click', () => {
+            window.location.href = 'concluidos.html';
+        });
+        
+        document.getElementById('menuLogout').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error("Erro ao fazer logout:", error);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Treinamentos - GZL Treinamentos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="./CSS/perfil.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GZL Treinamentos</h2>
+            <p>Bem-vindo, <span id="userName"></span></p>
+        </div>
+        <ul class="sidebar-menu">
+            <li id="menuHome">
+                <i class="material-icons">home</i> Home
+            </li>
+            <li id="menuEmployees" class="active">
+                <i class="material-icons">people</i> Funcionários
+            </li>
+            <li id="menuTrainings">
+                <i class="material-icons">school</i> Treinamentos
+            </li>
+            <li id="menuProfile">
+                <i class="material-icons">person</i> Perfil
+            </li>
+            <li id="menuLogout">
+                <i class="material-icons">logout</i> Sair
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="training-management-container">
+            <h1>Gerenciamento de Treinamentos</h1>
+            
+            <div class="training-actions">
+                <div class="search-container">
+                    <input type="text" id="searchTraining" placeholder="Pesquisar treinamento...">
+                    <button id="searchTrainingButton">
+                        <i class="material-icons">search</i>
+                    </button>
+                </div>
+                <button id="addTrainingButton" class="primary-button">
+                    <i class="material-icons">add</i> Novo Treinamento
+                </button>
+            </div>
+            
+            <div class="training-list" id="trainingList">
+                <div class="loading-message">Carregando treinamentos...</div>
+            </div>
+            
+            <div class="training-form-container" id="trainingFormContainer">
+                <h2 id="formTitle">Adicionar Novo Treinamento</h2>
+                
+                <div class="form-section">
+                    <h3>Informações Básicas</h3>
+                    
+                    <div class="cover-image-container">
+                        <label>Imagem de Capa:</label>
+                        <img id="coverImagePreview" class="cover-image-preview" src="" alt="Pré-visualização da capa" style="display: none;">
+                        <input type="file" id="coverImageUpload" accept="image/*" style="display: none;">
+                        <button type="button" class="upload-button" id="uploadCoverButton">
+                            <i class="material-icons">image</i> Selecionar Imagem
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trainingName">Nome do Treinamento:</label>
+                        <input type="text" id="trainingName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trainingCode">Código/Norma (ex: NR11):</label>
+                        <input type="text" id="trainingCode" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trainingDescription">Descrição:</label>
+                        <textarea id="trainingDescription" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trainingDuration">Duração estimada (horas):</label>
+                        <input type="number" id="trainingDuration" min="1" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trainingValidity">Validade do certificado (anos):</label>
+                        <input type="number" id="trainingValidity" min="1" value="12">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trainingStatus">Status:</label>
+                        <select id="trainingStatus">
+                            <option value="active">Ativo</option>
+                            <option value="inactive">Inativo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Criado por:</label>
+                        <input type="text" id="createdByEmail" readonly value="">
+                    </div>
+                    
+                    <div class="form-group editors-container">
+                        <label>Editores autorizados (além de você):</label>
+                        <div class="editor-email-input">
+                            <input type="email" id="newEditorEmail" placeholder="Digite o email do editor">
+                            <button type="button" class="primary-button" id="addEditorButton">
+                                <i class="material-icons">add</i> Adicionar
+                            </button>
+                        </div>
+                        <div class="editor-email-list" id="editorEmailList">
+                            <!-- Emails dos editores serão adicionados aqui -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Funções que precisam realizar este treinamento:</label>
+                        <div class="function-filters">
+                            <div class="form-group">
+                                <label for="unitFilter">Filtrar por Unidade:</label>
+                                <select id="unitFilter">
+                                    <option value="">Todas as Unidades</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="functionSearch">Pesquisar Função:</label>
+                                <input type="text" id="functionSearch" placeholder="Digite para pesquisar...">
+                            </div>
+                        </div>
+                        <div class="functions-container">
+                            <div class="functions-list" id="functionsList">
+                                <!-- Funções serão carregadas dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Vídeos/Aulas</h3>
+                    <div id="videoItemsContainer">
+                        <!-- Itens de vídeo serão adicionados aqui -->
+                    </div>
+                    <button type="button" class="add-item-button" id="addVideoButton">
+                        <i class="material-icons">add</i> Adicionar Vídeo
+                    </button>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Questionário Final</h3>
+                    <div id="questionItemsContainer">
+                        <!-- Itens de questão serão adicionados aqui -->
+                    </div>
+                    <button type="button" class="add-item-button" id="addQuestionButton">
+                        <i class="material-icons">add</i> Adicionar Pergunta
+                    </button>
+                </div>
+                
+                <div class="form-actions">
+                    <button id="cancelTrainingForm" class="secondary-button">
+                        <i class="material-icons">cancel</i> Cancelar
+                    </button>
+                    <button id="saveTraining" class="primary-button">
+                        <i class="material-icons">save</i> Salvar Treinamento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template para itens de vídeo -->
+    <template id="videoItemTemplate">
+        <div class="video-item" data-video-index="">
+            <div class="form-group">
+                <label>Título da Aula:</label>
+                <input type="text" class="video-title" required>
+            </div>
+            <div class="form-group">
+                <label>URL do Vídeo (YouTube):</label>
+                <input type="url" class="video-url" required placeholder="https://www.youtube.com/embed/VIDEO_ID">
+            </div>
+            <div class="form-group">
+                <label>Ordem de exibição:</label>
+                <input type="number" class="video-order" min="1" value="1" required>
+            </div>
+            <button type="button" class="remove-item-button remove-video">
+                <i class="material-icons">delete</i> Remover
+            </button>
+        </div>
+    </template>
+    
+    <!-- Template para itens de questão -->
+    <template id="questionItemTemplate">
+        <div class="question-item" data-question-index="">
+            <div class="form-group">
+                <label>Pergunta:</label>
+                <input type="text" class="question-text" required>
+            </div>
+            <div class="form-group">
+                <label>Opções de Resposta:</label>
+                <div class="options-container">
+                    <!-- Opções serão adicionadas aqui -->
+                </div>
+                <button type="button" class="add-option-button">Adicionar Opção</button>
+            </div>
+            <div class="form-group">
+                <label>Resposta Correta:</label>
+                <select class="correct-answer" required>
+                    <!-- Opções serão preenchidas dinamicamente -->
+                </select>
+            </div>
+            <button type="button" class="remove-item-button remove-question">
+                <i class="material-icons">delete</i> Remover
+            </button>
+        </div>
+    </template>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G"
+        };
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        let currentUser = null;
+        let currentEditingTrainingId = null;
+        let coverImageBase64 = '';
+        let availableFunctions = [];
+        let units = new Set();
+        let trainingEditors = [];
+
+        // Monitora o estado de autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+                document.getElementById('createdByEmail').value = user.email;
+                loadAvailableFunctions();
+                loadTrainings();
+                
+                // Configura o botão para adicionar editores
+                document.getElementById('addEditorButton').addEventListener('click', function() {
+                    const emailInput = document.getElementById('newEditorEmail');
+                    const email = emailInput.value.trim();
+                    
+                    if (email && validateEmail(email)) {
+                        if (!trainingEditors.includes(email) && email !== currentUser.email) {
+                            trainingEditors.push(email);
+                            renderEditorEmails();
+                            emailInput.value = '';
+                        } else {
+                            alert('Este email já foi adicionado ou é o seu próprio email.');
+                        }
+                    } else {
+                        alert('Por favor, insira um email válido.');
+                    }
+                });
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Função para validar email
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Função para renderizar a lista de editores
+        function renderEditorEmails() {
+            const editorList = document.getElementById('editorEmailList');
+            editorList.innerHTML = '';
+            
+            if (trainingEditors.length === 0) {
+                editorList.innerHTML = '<p>Nenhum editor adicional adicionado</p>';
+                return;
+            }
+            
+            trainingEditors.forEach(email => {
+                const emailItem = document.createElement('div');
+                emailItem.className = 'editor-email-item';
+                emailItem.innerHTML = `
+                    <span>${email}</span>
+                    <button class="remove-editor-btn" data-email="${email}">
+                        <i class="material-icons">delete</i>
+                    </button>
+                `;
+                editorList.appendChild(emailItem);
+                
+                // Configura o botão de remover
+                emailItem.querySelector('.remove-editor-btn').addEventListener('click', function() {
+                    const emailToRemove = this.getAttribute('data-email');
+                    trainingEditors = trainingEditors.filter(e => e !== emailToRemove);
+                    renderEditorEmails();
+                });
+            });
+        }
+
+        // Carrega as funções disponíveis do banco de dados
+        function loadAvailableFunctions() {
+            database.ref('funcoes_por_unidade').once('value').then((snapshot) => {
+                const functionsData = snapshot.val();
+                availableFunctions = [];
+                units.clear();
+                
+                if (functionsData) {
+                    for (const funcId in functionsData) {
+                        const funcData = functionsData[funcId];
+                        availableFunctions.push({
+                            id: funcId,
+                            name: funcData.name,
+                            unidade: funcData.unidade
+                        });
+                        
+                        if (funcData.unidade) {
+                            units.add(funcData.unidade);
+                        }
+                    }
+                }
+                
+                // Preenche o filtro de unidades
+                const unitFilter = document.getElementById('unitFilter');
+                unitFilter.innerHTML = '<option value="">Todas as Unidades</option>';
+                
+                units.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit;
+                    option.textContent = unit;
+                    unitFilter.appendChild(option);
+                });
+                
+                renderFunctionsList();
+                
+                // Configura os eventos dos filtros
+                document.getElementById('unitFilter').addEventListener('change', filterFunctions);
+                document.getElementById('functionSearch').addEventListener('input', filterFunctions);
+                
+            }).catch((error) => {
+                console.error("Erro ao carregar funções:", error);
+            });
+        }
+
+        // Filtra as funções com base nos critérios selecionados
+        function filterFunctions() {
+            const unitFilter = document.getElementById('unitFilter').value;
+            const searchTerm = document.getElementById('functionSearch').value.toLowerCase();
+            
+            const filteredFunctions = availableFunctions.filter(func => {
+                const matchesUnit = !unitFilter || func.unidade === unitFilter;
+                const matchesSearch = !searchTerm || 
+                    func.name.toLowerCase().includes(searchTerm) || 
+                    (func.unidade && func.unidade.toLowerCase().includes(searchTerm));
+                
+                return matchesUnit && matchesSearch;
+            });
+            
+            renderFunctionsList([], filteredFunctions);
+        }
+
+        // Renderiza a lista de funções no formulário
+        function renderFunctionsList(selectedFunctions = [], functionsToShow = null) {
+            const functionsList = document.getElementById('functionsList');
+            functionsList.innerHTML = '';
+            
+            const functions = functionsToShow || availableFunctions;
+            
+            if (functions.length === 0) {
+                functionsList.innerHTML = '<p>Nenhuma função encontrada</p>';
+                return;
+            }
+            
+            functions.forEach(func => {
+                const funcItem = document.createElement('div');
+                funcItem.className = 'function-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `func-${func.id}`;
+                checkbox.value = func.id;
+                checkbox.checked = selectedFunctions.includes(func.id);
+                
+                const label = document.createElement('label');
+                label.htmlFor = `func-${func.id}`;
+                label.textContent = `${func.name} (${func.unidade || 'Sem unidade'})`;
+                
+                funcItem.appendChild(checkbox);
+                funcItem.appendChild(label);
+                functionsList.appendChild(funcItem);
+            });
+        }
+
+        // Configura o upload da imagem de capa
+        document.getElementById('uploadCoverButton').addEventListener('click', function() {
+            document.getElementById('coverImageUpload').click();
+        });
+        
+        document.getElementById('coverImageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                coverImageBase64 = e.target.result;
+                const preview = document.getElementById('coverImagePreview');
+                preview.src = coverImageBase64;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Carrega todos os treinamentos
+        function loadTrainings(searchTerm = '') {
+            const trainingList = document.getElementById('trainingList');
+            trainingList.innerHTML = '<div class="loading-message">Carregando treinamentos...</div>';
+            
+            database.ref('trainings').once('value').then((snapshot) => {
+                const trainings = snapshot.val();
+                trainingList.innerHTML = '';
+                
+                if (!trainings) {
+                    trainingList.innerHTML = '<div class="no-items">Nenhum treinamento cadastrado</div>';
+                    return;
+                }
+                
+                let hasResults = false;
+                const trainingItems = [];
+                
+                for (const trainingId in trainings) {
+                    const training = trainings[trainingId];
+                    
+                    // Filtra por termo de pesquisa
+                    if (searchTerm && 
+                        !training.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                        !training.code.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        continue;
+                    }
+                    
+                    hasResults = true;
+                    
+                    // Verifica se o usuário atual pode editar este treinamento
+                    const canEdit = currentUser && 
+                        (training.updatedBy === currentUser.uid || 
+                         (training.allowedEditors && training.allowedEditors.includes(currentUser.email)));
+                    
+                    trainingItems.push(`
+                        <div class="training-item">
+                            <div class="training-info">
+                                <h3>${training.name} (${training.code})</h3>
+                                <p>${training.description || 'Sem descrição'}</p>
+                                <p>Duração: ${training.duration}h | Validade: ${training.validity} anos </p>
+                                <p>Status: ${training.status === 'active' ? 'Ativo' : 'Inativo'}</p>
+                                <p>Aulas: ${training.videos ? training.videos.length : 0} | Questões: ${training.questions ? training.questions.length : 0}</p>
+                                <p>Funções: ${training.requiredFunctions ? training.requiredFunctions.length : 0}</p>
+                                <p class="creators">Criado por: ${training.updatedByEmail || 'N/A'}</p>
+                            </div>
+                            <div class="training-actions">
+                                ${canEdit ? `
+                                <button class="edit-training" data-trainingid="${trainingId}">
+                                    <i class="material-icons">edit</i> Editar
+                                </button>
+                                <button class="delete-training" data-trainingid="${trainingId}">
+                                    <i class="material-icons">delete</i> Excluir
+                                </button>
+                                ` : `
+                                <button class="view-training" data-trainingid="${trainingId}">
+                                    <i class="material-icons">visibility</i> Visualizar
+                                </button>
+                                `}
+                            </div>
+                        </div>
+                    `);
+                }
+                
+                if (!hasResults) {
+                    trainingList.innerHTML = '<div class="no-items">Nenhum treinamento encontrado</div>';
+                } else {
+                    trainingList.innerHTML = trainingItems.join('');
+                    setupTrainingButtons();
+                }
+            }).catch((error) => {
+                console.error("Erro ao carregar treinamentos:", error);
+                trainingList.innerHTML = '<div class="error-message">Erro ao carregar treinamentos</div>';
+            });
+        }
+
+        // Configura os botões de ação
+        function setupTrainingButtons() {
+            // Botões de edição
+            document.querySelectorAll('.edit-training').forEach(button => {
+                button.addEventListener('click', function() {
+                    const trainingId = this.getAttribute('data-trainingid');
+                    editTraining(trainingId);
+                });
+            });
+            
+            // Botões de exclusão
+            document.querySelectorAll('.delete-training').forEach(button => {
+                button.addEventListener('click', function() {
+                    const trainingId = this.getAttribute('data-trainingid');
+                    deleteTraining(trainingId);
+                });
+            });
+            
+            // Botões de visualização
+            document.querySelectorAll('.view-training').forEach(button => {
+                button.addEventListener('click', function() {
+                    const trainingId = this.getAttribute('data-trainingid');
+                    viewTraining(trainingId);
+                });
+            });
+        }
+
+        // Visualiza um treinamento (sem edição)
+        function viewTraining(trainingId) {
+            alert('Visualizar treinamento: ' + trainingId);
+            // Implemente a visualização conforme necessário
+        }
+
+        // Adiciona um novo item de vídeo
+        document.getElementById('addVideoButton').addEventListener('click', function() {
+            const videoItemsContainer = document.getElementById('videoItemsContainer');
+            const template = document.getElementById('videoItemTemplate');
+            const clone = template.content.cloneNode(true);
+            const videoItem = clone.querySelector('.video-item');
+            
+            // Define o índice do vídeo
+            const videoIndex = videoItemsContainer.children.length;
+            videoItem.setAttribute('data-video-index', videoIndex);
+            
+            // Adiciona o item ao container
+            videoItemsContainer.appendChild(clone);
+            
+            // Configura o botão de remover
+            videoItem.querySelector('.remove-video').addEventListener('click', function() {
+                videoItem.remove();
+                reindexVideoItems();
+            });
+        });
+
+        // Adiciona um novo item de questão
+        document.getElementById('addQuestionButton').addEventListener('click', function() {
+            const questionItemsContainer = document.getElementById('questionItemsContainer');
+            const template = document.getElementById('questionItemTemplate');
+            const clone = template.content.cloneNode(true);
+            const questionItem = clone.querySelector('.question-item');
+            
+            // Define o índice da questão
+            const questionIndex = questionItemsContainer.children.length;
+            questionItem.setAttribute('data-question-index', questionIndex);
+            
+            // Adiciona o item ao container
+            questionItemsContainer.appendChild(clone);
+            
+            // Configura o botão de adicionar opção
+            questionItem.querySelector('.add-option-button').addEventListener('click', function() {
+                addOptionToQuestion(questionItem);
+            });
+            
+            // Configura o botão de remover
+            questionItem.querySelector('.remove-question').addEventListener('click', function() {
+                questionItem.remove();
+                reindexQuestionItems();
+            });
+            
+            // Adiciona uma opção inicial
+            addOptionToQuestion(questionItem);
+        });
+
+        // Adiciona uma opção a uma questão
+        function addOptionToQuestion(questionItem) {
+            const optionsContainer = questionItem.querySelector('.options-container');
+            const optionIndex = optionsContainer.children.length;
+            const optionLetter = String.fromCharCode(97 + optionIndex); // a, b, c, ...
+            
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'option-container';
+            
+            optionDiv.innerHTML = `
+                <input type="radio" name="temp-radio-${questionItem.dataset.questionIndex}" value="${optionLetter}" 
+                    ${optionIndex === 0 ? 'checked' : ''}>
+                <input type="text" class="option-text" placeholder="Texto da opção ${optionLetter}" required>
+                <button type="button" class="remove-option-button">
+                    <i class="material-icons" style="font-size: 16px;">close</i>
+                </button>
+            `;
+            
+            optionsContainer.appendChild(optionDiv);
+            
+            // Configura o botão de remover opção
+            optionDiv.querySelector('.remove-option-button').addEventListener('click', function() {
+                optionDiv.remove();
+                updateCorrectAnswerOptions(questionItem);
+            });
+            
+            // Atualiza as opções de resposta correta
+            updateCorrectAnswerOptions(questionItem);
+        }
+
+        // Atualiza as opções de resposta correta
+        function updateCorrectAnswerOptions(questionItem) {
+            const optionsContainer = questionItem.querySelector('.options-container');
+            const correctAnswerSelect = questionItem.querySelector('.correct-answer');
+            
+            // Limpa as opções atuais
+            correctAnswerSelect.innerHTML = '';
+            
+            // Adiciona novas opções baseadas nas opções disponíveis
+            Array.from(optionsContainer.children).forEach((optionDiv, index) => {
+                const optionLetter = String.fromCharCode(97 + index);
+                const optionText = optionDiv.querySelector('.option-text').value || `Opção ${optionLetter}`;
+                
+                const optionElement = document.createElement('option');
+                optionElement.value = optionLetter;
+                optionElement.textContent = optionLetter.toUpperCase() + ') ' + optionText;
+                correctAnswerSelect.appendChild(optionElement);
+            });
+            
+            // Seleciona a primeira opção por padrão
+            if (correctAnswerSelect.options.length > 0) {
+                correctAnswerSelect.value = correctAnswerSelect.options[0].value;
+            }
+        }
+
+        // Reindexa os itens de vídeo
+        function reindexVideoItems() {
+            const videoItems = document.getElementById('videoItemsContainer').children;
+            Array.from(videoItems).forEach((item, index) => {
+                item.setAttribute('data-video-index', index);
+            });
+        }
+
+        // Reindexa os itens de questão
+        function reindexQuestionItems() {
+            const questionItems = document.getElementById('questionItemsContainer').children;
+            Array.from(questionItems).forEach((item, index) => {
+                item.setAttribute('data-question-index', index);
+            });
+        }
+
+        // Abre o formulário para edição
+        async function editTraining(trainingId) {
+            try {
+                currentEditingTrainingId = trainingId;
+                
+                const snapshot = await database.ref(`trainings/${trainingId}`).once('value');
+                const training = snapshot.val();
+                
+                if (!training) throw new Error('Treinamento não encontrado');
+                
+                // Preenche informações básicas
+                document.getElementById('formTitle').textContent = 'Editar Treinamento';
+                document.getElementById('trainingName').value = training.name;
+                document.getElementById('trainingCode').value = training.code;
+                document.getElementById('trainingDescription').value = training.description || '';
+                document.getElementById('trainingDuration').value = training.duration || 1;
+                document.getElementById('trainingValidity').value = training.validity || 12;
+                document.getElementById('trainingStatus').value = training.status || 'active';
+                document.getElementById('createdByEmail').value = training.updatedByEmail || currentUser.email;
+                
+                // Carrega os editores
+                trainingEditors = training.allowedEditors || [];
+                if (trainingEditors.includes(currentUser.email)) {
+                    trainingEditors = trainingEditors.filter(e => e !== currentUser.email);
+                }
+                renderEditorEmails();
+                
+                // Preenche imagem de capa
+                const preview = document.getElementById('coverImagePreview');
+                if (training.coverImage) {
+                    coverImageBase64 = training.coverImage;
+                    preview.src = coverImageBase64;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+                
+                // Preenche funções selecionadas
+                const selectedFunctions = training.requiredFunctions || [];
+                renderFunctionsList(selectedFunctions);
+                
+                // Limpa containers de vídeos e questões
+                document.getElementById('videoItemsContainer').innerHTML = '';
+                document.getElementById('questionItemsContainer').innerHTML = '';
+                
+                // Adiciona vídeos
+                if (training.videos && training.videos.length > 0) {
+                    training.videos.forEach((video, index) => {
+                        const videoItemsContainer = document.getElementById('videoItemsContainer');
+                        const template = document.getElementById('videoItemTemplate');
+                        const clone = template.content.cloneNode(true);
+                        const videoItem = clone.querySelector('.video-item');
+                        
+                        videoItem.setAttribute('data-video-index', index);
+                        videoItem.querySelector('.video-title').value = video.title;
+                        videoItem.querySelector('.video-url').value = video.url;
+                        videoItem.querySelector('.video-order').value = video.order || (index + 1);
+                        
+                        videoItemsContainer.appendChild(clone);
+                        
+                        // Configura o botão de remover
+                        videoItem.querySelector('.remove-video').addEventListener('click', function() {
+                            videoItem.remove();
+                            reindexVideoItems();
+                        });
+                    });
+                }
+                
+                // Adiciona questões
+                if (training.questions && training.questions.length > 0) {
+                    training.questions.forEach((question, index) => {
+                        const questionItemsContainer = document.getElementById('questionItemsContainer');
+                        const template = document.getElementById('questionItemTemplate');
+                        const clone = template.content.cloneNode(true);
+                        const questionItem = clone.querySelector('.question-item');
+                        
+                        questionItem.setAttribute('data-question-index', index);
+                        questionItem.querySelector('.question-text').value = question.text;
+                        
+                        // Adiciona opções
+                        const optionsContainer = questionItem.querySelector('.options-container');
+                        optionsContainer.innerHTML = '';
+                        
+                        question.options.forEach((option, optionIndex) => {
+                            const optionLetter = String.fromCharCode(97 + optionIndex);
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = 'option-container';
+                            
+                            optionDiv.innerHTML = `
+                                <input type="radio" name="temp-radio-${index}" value="${optionLetter}" 
+                                    ${optionLetter === question.correctAnswer ? 'checked' : ''}>
+                                <input type="text" class="option-text" value="${option}" required>
+                                <button type="button" class="remove-option-button">
+                                    <i class="material-icons" style="font-size: 16px;">close</i>
+                                </button>
+                            `;
+                            
+                            optionsContainer.appendChild(optionDiv);
+                            
+                            // Configura o botão de remover opção
+                            optionDiv.querySelector('.remove-option-button').addEventListener('click', function() {
+                                optionDiv.remove();
+                                updateCorrectAnswerOptions(questionItem);
+                            });
+                        });
+                        
+                        // Atualiza a resposta correta
+                        updateCorrectAnswerOptions(questionItem);
+                        questionItem.querySelector('.correct-answer').value = question.correctAnswer;
+                        
+                        questionItemsContainer.appendChild(clone);
+                        
+                        // Configura o botão de adicionar opção
+                        questionItem.querySelector('.add-option-button').addEventListener('click', function() {
+                            addOptionToQuestion(questionItem);
+                        });
+                        
+                        // Configura o botão de remover questão
+                        questionItem.querySelector('.remove-question').addEventListener('click', function() {
+                            questionItem.remove();
+                            reindexQuestionItems();
+                        });
+                    });
+                }
+                
+                // Mostra o formulário
+                document.getElementById('trainingFormContainer').style.display = 'block';
+                window.scrollTo(0, 0);
+                
+            } catch (error) {
+                console.error("Erro ao editar treinamento:", error);
+                alert('Erro ao carregar treinamento: ' + error.message);
+            }
+        }
+
+        // Exclui um treinamento
+        function deleteTraining(trainingId) {
+            if (confirm('Tem certeza que deseja excluir este treinamento? Todos os dados serão perdidos.')) {
+                database.ref(`trainings/${trainingId}`).remove()
+                    .then(() => {
+                        alert('Treinamento excluído com sucesso!');
+                        loadTrainings();
+                    })
+                    .catch(error => {
+                        console.error("Erro ao excluir treinamento:", error);
+                        alert('Erro ao excluir treinamento: ' + error.message);
+                    });
+            }
+        }
+
+        // Salva um treinamento (novo ou existente)
+        document.getElementById('saveTraining').addEventListener('click', async function() {
+            // Coleta dados básicos
+            const trainingData = {
+                name: document.getElementById('trainingName').value,
+                code: document.getElementById('trainingCode').value,
+                description: document.getElementById('trainingDescription').value,
+                duration: parseInt(document.getElementById('trainingDuration').value),
+                validity: parseInt(document.getElementById('trainingValidity').value),
+                status: document.getElementById('trainingStatus').value,
+                lastUpdate: new Date().toISOString(),
+                updatedBy: currentUser.uid,
+                updatedByEmail: currentUser.email,
+                createdByEmail: document.getElementById('createdByEmail').value,
+                allowedEditors: [...trainingEditors, currentUser.email] // Inclui o criador + editores adicionais
+            };
+            
+            // Adiciona imagem de capa se existir
+            if (coverImageBase64) {
+                trainingData.coverImage = coverImageBase64;
+            }
+            
+            // Coleta funções selecionadas
+            const selectedFunctions = [];
+            document.querySelectorAll('#functionsList input[type="checkbox"]:checked').forEach(checkbox => {
+                selectedFunctions.push(checkbox.value);
+            });
+            trainingData.requiredFunctions = selectedFunctions;
+            
+            // Validação básica
+            if (!trainingData.name || !trainingData.code) {
+                alert('Por favor, preencha pelo menos o nome e código do treinamento');
+                return;
+            }
+            
+            // Coleta vídeos
+            const videoItems = document.getElementById('videoItemsContainer').children;
+            trainingData.videos = [];
+            
+            Array.from(videoItems).forEach(videoItem => {
+                trainingData.videos.push({
+                    title: videoItem.querySelector('.video-title').value,
+                    url: videoItem.querySelector('.video-url').value,
+                    order: parseInt(videoItem.querySelector('.video-order').value)
+                });
+            });
+            
+            // Valida vídeos
+            if (trainingData.videos.length === 0) {
+                alert('Por favor, adicione pelo menos um vídeo/aula');
+                return;
+            }
+            
+            // Coleta questões
+            const questionItems = document.getElementById('questionItemsContainer').children;
+            trainingData.questions = [];
+            
+            Array.from(questionItems).forEach(questionItem => {
+                const options = [];
+                const optionsElements = questionItem.querySelectorAll('.option-text');
+                
+                optionsElements.forEach((optionElement, index) => {
+                    const optionLetter = String.fromCharCode(97 + index);
+                    options.push(optionElement.value);
+                });
+                
+                trainingData.questions.push({
+                    text: questionItem.querySelector('.question-text').value,
+                    options: options,
+                    correctAnswer: questionItem.querySelector('.correct-answer').value
+                });
+            });
+            
+            // Valida questões
+            if (trainingData.questions.length === 0) {
+                alert('Por favor, adicione pelo menos uma questão para o questionário final');
+                return;
+            }
+            
+            try {
+                if (currentEditingTrainingId) {
+                    // Atualiza treinamento existente
+                    await database.ref(`trainings/${currentEditingTrainingId}`).update(trainingData);
+                    alert('Treinamento atualizado com sucesso!');
+                } else {
+                    // Cria novo treinamento
+                    await database.ref('trainings').push(trainingData);
+                    alert('Treinamento criado com sucesso!');
+                }
+                
+                // Recarrega a lista e limpa o formulário
+                loadTrainings();
+                cancelTrainingForm();
+                
+            } catch (error) {
+                console.error("Erro ao salvar treinamento:", error);
+                alert('Erro ao salvar treinamento: ' + error.message);
+            }
+        });
+
+        // Abre formulário para novo treinamento
+        document.getElementById('addTrainingButton').addEventListener('click', function() {
+            currentEditingTrainingId = null;
+            document.getElementById('formTitle').textContent = 'Adicionar Novo Treinamento';
+            
+            // Limpa o formulário
+            document.getElementById('trainingName').value = '';
+            document.getElementById('trainingCode').value = '';
+            document.getElementById('trainingDescription').value = '';
+            document.getElementById('trainingDuration').value = 1;
+            document.getElementById('trainingValidity').value = 12;
+            document.getElementById('trainingStatus').value = 'active';
+            document.getElementById('videoItemsContainer').innerHTML = '';
+            document.getElementById('questionItemsContainer').innerHTML = '';
+            
+            // Limpa a imagem de capa
+            coverImageBase64 = '';
+            const preview = document.getElementById('coverImagePreview');
+            preview.src = '';
+            preview.style.display = 'none';
+            document.getElementById('coverImageUpload').value = '';
+            
+            // Limpa funções selecionadas
+            renderFunctionsList();
+            
+            // Limpa editores
+            trainingEditors = [];
+            renderEditorEmails();
+            document.getElementById('newEditorEmail').value = '';
+            
+            // Limpa filtros
+            document.getElementById('unitFilter').value = '';
+            document.getElementById('functionSearch').value = '';
+            
+            // Preenche o criador com o usuário atual
+            document.getElementById('createdByEmail').value = currentUser.email;
+            
+            // Mostra o formulário
+            document.getElementById('trainingFormContainer').style.display = 'block';
+            window.scrollTo(0, 0);
+        });
+
+        // Cancela o formulário
+        document.getElementById('cancelTrainingForm').addEventListener('click', cancelTrainingForm);
+        
+        function cancelTrainingForm() {
+            currentEditingTrainingId = null;
+            document.getElementById('trainingFormContainer').style.display = 'none';
+        }
+
+        // Pesquisa treinamentos
+        document.getElementById('searchTrainingButton').addEventListener('click', function() {
+            const searchTerm = document.getElementById('searchTraining').value;
+            loadTrainings(searchTerm);
+        });
+        
+        document.getElementById('searchTraining').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = document.getElementById('searchTraining').value;
+                loadTrainings(searchTerm);
+            }
+        });
+
+        // Navegação do menu - Atualizado com prevenção de comportamento padrão
+        document.getElementById('menuHome').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'home.html';
+        });
+        
+        document.getElementById('menuTrainings').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'trinametoadm.html';
+        });
+        
+        document.getElementById('menuEmployees').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'admin.html';
+        });
+        
+        document.getElementById('menuProfile').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'perfiladm.html';
+        });
+        
+        document.getElementById('menuLogout').addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error("Erro ao fazer logout:", error);
+            });
+        });
+    </script>
+</body>
+</html>

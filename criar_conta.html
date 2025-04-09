@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - GZL Treinamentos</title>
+    <link rel="stylesheet" href="./CSS/style.css">
+    <!-- Firebase SDK (modular version) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+        
+        // Sua configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Função para salvar os dados do usuário
+        function saveUserData(userId, name, email, birthdate, unit, userType) {
+            return set(ref(database, 'users/' + userId), {
+                nome: name,
+                email: email,
+                data_nascimento: birthdate,
+                unidade: unit,
+                cargo: userType,
+                data_cadastro: new Date().toISOString()
+            });
+        }
+
+        // Disponibiliza para o script.js
+        window.firebase = {
+            auth,
+            database,
+            createUserWithEmailAndPassword,
+            saveUserData
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <form id="signUpForm">
+                <h1>Criar Conta</h1>
+                <input type="text" id="signUpName" placeholder="Nome Completo" required />
+                <input type="email" id="signUpEmail" placeholder="Email (@guizilim.log.br)" required />
+                <input type="password" id="signUpPassword" placeholder="Senha" required />
+                <input type="date" id="signUpBirthdate" required />
+                <select id="signUpUnit" required>
+                    <option value="" disabled selected>Selecione sua unidade</option>
+                    <option value="Fabrica Belem">Fabrica Belem</option>
+                    <option value="Fabrica Limeira">Fabrica Limeira</option>
+                    <option value="CD Cariacica">CD Cariacica</option>
+                </select>
+                <select id="signUpUserType" required>
+                    <option value="" disabled selected>Selecione seu cargo</option>
+                    <option value="Ajudante Geral">Ajudante Geral</option>
+                    <option value="Encarregado">Encarregado</option>
+                    <option value="Líder">Líder</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Gerente">Gerente</option>
+                    <option value="Diretor">Diretor</option>
+                    <option value="Coordenador">Coordenador</option>
+                    <option value="Analista">Analista</option>
+                    <option value="Assistente">Assistente</option>
+                    <option value="Operador">Operador</option>
+                    <option value="Técnico">Técnico</option>
+                    <option value="Auxiliar">Auxiliar</option>
+                    <option value="Estagiário">Estagiário</option>
+                    <option value="Trainee">Trainee</option>
+                    <option value="Outro">Outro</option>
+                </select>
+                <button type="submit">Cadastrar</button>
+                <p>Já tem uma conta? <a href="login.html">Faça login</a></p>
+                <div id="message" style="margin-top: 15px;"></div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Adiciona o domínio padrão se não estiver presente
+        document.getElementById('signUpEmail').addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !email.includes('@')) {
+                this.value = email + '@guizilim.log.br';
+            }
+        });
+
+        // Processa o formulário de cadastro
+        document.getElementById('signUpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('signUpName').value;
+            const email = document.getElementById('signUpEmail').value;
+            const password = document.getElementById('signUpPassword').value;
+            const birthdate = document.getElementById('signUpBirthdate').value;
+            const unit = document.getElementById('signUpUnit').value;
+            const userType = document.getElementById('signUpUserType').value;
+            const messageDiv = document.getElementById('message');
+            
+            // Verifica se o email contém o domínio correto
+            if (!email.endsWith('@guizilim.log.br')) {
+                messageDiv.innerHTML = 'Por favor, use um email com o domínio @guizilim.log.br';
+                messageDiv.style.color = 'red';
+                return;
+            }
+
+            // Cria o usuário no Firebase Auth
+            firebase.createUserWithEmailAndPassword(firebase.auth, email, password)
+                .then((userCredential) => {
+                    // Usuário criado com sucesso
+                    const userId = userCredential.user.uid;
+                    
+                    // Salva os dados adicionais no Realtime Database
+                    return firebase.saveUserData(userId, name, email, birthdate, unit, userType);
+                })
+                .then(() => {
+                    // Sucesso - redireciona ou mostra mensagem
+                    messageDiv.innerHTML = 'Cadastro realizado com sucesso! Redirecionando...';
+                    messageDiv.style.color = 'green';
+                })
+                .catch((error) => {
+                    // Trata erros
+                    let errorMessage = error.message;
+                    
+                    // Mensagens mais amigáveis para erros comuns
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMessage = 'Este email já está cadastrado.';
+                    } else if (error.code === 'auth/weak-password') {
+                        errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
+                    }
+                    
+                    messageDiv.innerHTML = errorMessage;
+                    messageDiv.style.color = 'red';
+                });
+        });
+    </script>
+</body>
+</html>

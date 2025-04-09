@@ -1,0 +1,974 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Menu Lateral */
+.sidebar {
+    width: 250px;
+    background-color: #254c00;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    padding: 20px 0;
+}
+
+.sidebar-header {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid #8fb76d;
+    margin-bottom: 20px;
+}
+
+.sidebar-menu {
+    list-style: none;
+}
+
+.sidebar-menu li {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sidebar-menu li:hover {
+    background-color: #8fb76d;
+}
+
+.sidebar-menu li.active {
+    background-color: #416620;
+}
+
+.sidebar-menu li i {
+    margin-right: 10px;
+}
+
+
+.main-content {
+    margin-left: 250px;
+    padding: 30px;
+    width: calc(100% - 250px);
+    box-sizing: border-box;
+}
+
+.profile-container {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-section {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.profile-picture {
+    width: 250px;
+    text-align: center;
+}
+
+.profile-picture img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #f0f0f0;
+}
+
+.upload-controls {
+    margin-top: 20px;
+}
+
+.upload-label {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #254c00;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.upload-label i {
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+#uploadPhoto {
+    display: none;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.info-grid div {
+    margin-bottom: 15px;
+}
+
+.info-grid input, .info-grid select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.documents-section {
+    margin-bottom: 30px;
+}
+
+.document-upload {
+    margin-bottom: 15px;
+}
+
+.document-upload label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.save-button {
+    background-color: #254c00;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.save-button:hover {
+    background-color: #1a3a00;
+}
+
+.trainings-section {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+#completedTrainings {
+    list-style: none;
+    padding: 0;
+}
+
+#completedTrainings li {
+    background: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #254c00;
+}
+
+@media (max-width: 768px) {
+    .profile-section {
+        flex-direction: column;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* Estilo geral da seção de documentos */
+.documents-section {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .documents-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+  }
+  
+  /* Container de cada upload */
+  .document-upload {
+    margin-bottom: 25px;
+    position: relative;
+  }
+  
+  .document-upload label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #34495e;
+  }
+  
+  /* Estilização do input file customizado */
+  .document-upload input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  /* Botão customizado */
+  .document-upload .custom-upload-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .document-upload .custom-upload-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .document-upload .custom-upload-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Ícone do botão */
+  .document-upload .custom-upload-button::before {
+    content: "📄";
+    margin-right: 8px;
+    font-size: 16px;
+  }
+  
+  /* Status do documento */
+  .document-upload span[id$="Status"] {
+    display: inline-block;
+    margin-left: 15px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  /* Status não enviado */
+  .document-upload span[id$="Status"] {
+    color: #e74c3c;
+    background-color: #fde8e8;
+  }
+  
+  /* Status quando arquivo selecionado */
+  .document-upload input[type="file"]:valid + span[id$="Status"] {
+    color: #27ae60;
+    background-color: #e8f8f0;
+    content: "Enviado";
+  }
+  
+  /* Container do botão + status */
+  .upload-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Efeito de foco acessível */
+  .document-upload input[type="file"]:focus + .custom-upload-button {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+  }
+  
+  /* Versão para mobile */
+  @media (max-width: 480px) {
+    .upload-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .document-upload span[id$="Status"] {
+      margin-left: 0;
+      margin-top: 8px;
+    }
+  }
+         /* Estilos específicos para gerenciamento de treinamentos */
+         .training-management-container {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .training-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .training-list {
+            margin-top: 20px;
+        }
+        
+        .training-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .training-form-container {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .video-item, .question-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        
+        .add-item-button {
+            margin-top: 10px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .remove-item-button {
+            background: #ea4335;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .option-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .option-container input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        /* Novos estilos para imagem de capa e funções */
+        .cover-image-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .cover-image-preview {
+            max-width: 300px;
+            max-height: 200px;
+            margin: 10px auto;
+            display: block;
+            border: 1px dashed #ccc;
+        }
+        
+        .functions-container {
+            margin-top: 15px;
+        }
+        
+        .functions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .function-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .function-item input {
+            margin-right: 8px;
+        }
+        
+        .upload-button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .upload-button:hover {
+            background: #3367d6;
+        }
+        /* Estilos para os botões do gerenciamento de treinamento */
+.primary-button {
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.primary-button:hover {
+    background: linear-gradient(135deg, #3367d6, #2d9248);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.primary-button:active {
+    transform: translateY(0);
+}
+
+.secondary-button {
+    background: linear-gradient(135deg, #fbbc05, #ea4335);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.secondary-button:hover {
+    background: linear-gradient(135deg, #e6a800, #d33426);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.secondary-button:active {
+    transform: translateY(0);
+}
+
+/* Botões de ação nos itens de treinamento */
+.training-actions button {
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.training-actions .edit-training {
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: white;
+}
+
+.training-actions .edit-training:hover {
+    background: linear-gradient(135deg, #3367d6, #2d9248);
+}
+
+.training-actions .delete-training {
+    background: linear-gradient(135deg, #ea4335, #fbbc05);
+    color: white;
+}
+
+.training-actions .delete-training:hover {
+    background: linear-gradient(135deg, #d33426, #e6a800);
+}
+
+/* Botões de adicionar itens */
+.add-item-button {
+    background: linear-gradient(135deg, #34a853, #4285f4);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-item-button:hover {
+    background: linear-gradient(135deg, #2d9248, #3367d6);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Botões de remoção */
+.remove-item-button {
+    background: linear-gradient(135deg, #ea4335, #fbbc05);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.remove-item-button:hover {
+    background: linear-gradient(135deg, #d33426, #e6a800);
+}
+
+/* Botão de upload */
+.upload-button {
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.upload-button:hover {
+    background: linear-gradient(135deg, #3367d6, #2d9248);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Botão de pesquisa */
+#searchTrainingButton {
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 0 30px 30px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#searchTrainingButton:hover {
+    background: linear-gradient(135deg, #3367d6, #2d9248);
+}
+
+/* Efeito de hover para todos os botões */
+button:not(:disabled):hover {
+    opacity: 0.9;
+}
+
+/* Efeito de foco para acessibilidade */
+button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.3);
+}
+/* Estilos para campos de input, select e textarea */
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+    background-color: white;
+    outline: none;
+}
+
+/* Estilo para labels */
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+    font-size: 14px;
+}
+
+/* Estilo para o campo de pesquisa */
+.search-container {
+    display: flex;
+    width: 300px;
+}
+
+#searchTraining {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 30px 0 0 30px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+}
+
+#searchTraining:focus {
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+    background-color: white;
+    outline: none;
+}
+
+/* Estilo para o container de funções */
+.functions-container {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.functions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.function-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.function-item:hover {
+    border-color: #4285f4;
+}
+
+.function-item input {
+    margin-right: 10px;
+    accent-color: #4285f4;
+}
+
+.function-item label {
+    font-weight: normal;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+/* Estilo para os itens de vídeo e questão */
+.video-item, .question-item {
+    padding: 20px;
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Estilo para os containers de opções */
+.options-container {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.option-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 6px;
+}
+
+.option-container input[type="radio"] {
+    accent-color: #34a853;
+    margin-right: 10px;
+}
+
+.option-container input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+/* Botão de adicionar opção */
+.add-option-button {
+    background: #f1f1f1;
+    color: #444;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.add-option-button:hover {
+    background: #e0e0e0;
+}
+
+/* Botão de remover opção */
+.remove-option-button {
+    background: transparent;
+    color: #ea4335;
+    border: none;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.remove-option-button:hover {
+    background: rgba(234, 67, 53, 0.1);
+}
+
+/* Estilo para o select de resposta correta */
+.correct-answer {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    color: #333;
+    margin-top: 10px;
+}
+
+.correct-answer:focus {
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+    outline: none;
+}
+
+/* Estilo para a pré-visualização da imagem */
+.cover-image-preview {
+    max-width: 100%;
+    max-height: 200px;
+    margin: 15px auto;
+    display: block;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+/* Estilo para os títulos das seções */
+.form-section h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 18px;
+}
+
+/* Estilo para o container do formulário */
+.training-form-container {
+    display: none;
+    margin-top: 20px;
+    padding: 25px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Estilo para os itens de treinamento na lista */
+.training-item {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.training-item:hover {
+    background-color: #f9f9f9;
+}
+
+.training-info h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 16px;
+}
+
+.training-info p {
+    margin: 3px 0;
+    color: #666;
+    font-size: 13px;
+}
+        .function-filters {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .function-filters .form-group {
+            margin: 0;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .function-filters label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .function-filters select, 
+        .function-filters input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .functions-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .function-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+        
+        .function-item:hover {
+            background: #e9e9e9;
+        }
+        
+        .function-item label {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .editors-container {
+            margin-top: 15px;
+        }
+        .editor-email-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .editor-email-input input {
+            flex: 1;
+            padding: 8px;
+            margin-right: 10px;
+        }
+        .editor-email-list {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .editor-email-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .editor-email-item:last-child {
+            border-bottom: none;
+        }
+        .remove-editor-btn {
+            color: #ff4444;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .training-item .training-info p.creators {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }

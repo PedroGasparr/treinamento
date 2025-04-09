@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Funcionários - GZL Treinamentos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="./CSS/admin.css">
+    <style>
+        /* Estilos para os novos containers */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .action-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .action-card {
+            flex: 1;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .action-card i {
+            font-size: 48px;
+            color: #4285F4;
+            margin-bottom: 15px;
+        }
+        
+        .action-card h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .action-card p {
+            color: #666;
+            margin: 10px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Lateral -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GZL Treinamentos</h2>
+            <p>Bem-vindo, <span id="userName"></span></p>
+        </div>
+        <ul class="sidebar-menu">
+            <li id="menuHome">
+                <i class="material-icons">home</i> Home
+            </li>
+            <li id="menuEmployees" class="active">
+                <i class="material-icons">people</i> Funcionários
+            </li>
+            <li id="menuTrainings">
+                <i class="material-icons">school</i> Treinamentos
+            </li>
+            <li id="menuProfile">
+                <i class="material-icons">person</i> Perfil
+            </li>
+            <li id="menuLogout">
+                <i class="material-icons">logout</i> Sair
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="action-container">
+            <!-- Container para Criar Funções -->
+            <div class="action-card" id="createFunctions">
+                <i class="material-icons">add_circle_outline</i>
+                <h3>Criar Funções</h3>
+                <p>Adicione novas funções/cargos para os funcionários</p>
+            </div>
+            
+            <!-- Container para Criar Treinamentos -->
+            <div class="action-card" id="createTrainings">
+                <i class="material-icons">library_add</i>
+                <h3>Criar Treinamentos</h3>
+                <p>Cadastre novos treinamentos para sua equipe</p>
+            </div>
+        </div>
+        
+        <!-- O restante do seu conteúdo existente viria aqui -->
+    </div>
+    
+    <!-- Adicione estas bibliotecas do Firebase antes do seu script -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <script>
+        // Inicialize o Firebase (substitua com sua configuração)
+        const firebaseConfig = {
+    apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+    authDomain: "gzltreinamentos.firebaseapp.com",
+    databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com",
+    projectId: "gzltreinamentos",
+    storageBucket: "gzltreinamentos.appspot.com",
+    messagingSenderId: "991106826698",
+    appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+    measurementId: "G-CG2PSQQ35G"
+};
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        
+        // Navegação do menu - Atualizado com prevenção de comportamento padrão
+        document.getElementById('menuHome').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'home.html';
+        });
+        
+        document.getElementById('menuTrainings').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'trinametoadm.html';
+        });
+        
+        document.getElementById('menuEmployees').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'admin.html';
+        });
+        
+        document.getElementById('menuProfile').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'perfiladm.html';
+        });
+        
+        document.getElementById('menuLogout').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (auth) { // Verifica se auth está definido
+                auth.signOut().then(() => {
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    console.error("Erro ao fazer logout:", error);
+                });
+            } else {
+                console.error("Auth não está definido");
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Adicionando funcionalidade aos novos containers
+        document.getElementById('createFunctions').addEventListener('click', () => {
+            // Verifica se o usuário está autenticado antes de redirecionar
+            if (auth.currentUser) {
+                window.location.href = 'criar_funcoes.html'; // Substitua pelo seu URL real
+            } else {
+                window.location.href = 'index.html'; // Redireciona para login se não autenticado
+            }
+        });
+        
+        document.getElementById('createTrainings').addEventListener('click', () => {
+            // Verifica se o usuário está autenticado antes de redirecionar
+            if (auth.currentUser) {
+                window.location.href = 'criartreinamneto.html'; // Substitua pelo seu URL real
+            } else {
+                window.location.href = 'index.html'; // Redireciona para login se não autenticado
+            }
+        });
+        
+        // Exibir nome do usuário
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // Usuário está logado
+                document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+            } else {
+                // Usuário não está logado, redireciona para index
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
