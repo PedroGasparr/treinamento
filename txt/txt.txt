@@ -254,16 +254,6 @@
         .play-audio-button i {
             margin-right: 5px;
         }
-        #transcription-message {
-        background-color: #e0f7fa;
-        border-left: 4px solid #00bcd4;
-        animation: pulseOpacity 1.5s infinite;
-    }
-    
-    @keyframes pulseOpacity {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
-    }
     </style>
 </head>
 <body>
@@ -435,35 +425,6 @@
                 userInput.focus();
             }
         }
-        function simulateRealTimeTranscription(audioBlob) {
-    return new Promise((resolve) => {
-        // Em produção, substitua por um serviço real de STT como Google Speech-to-Text
-        const phrases = [
-            "Obrigado pelo seu áudio",
-            "Estou processando sua mensagem",
-            "Aguarde um momento",
-            "Quase terminando",
-            "Transcrição completa"
-        ];
-        
-        let currentPhrase = 0;
-        const transcriptionElement = document.createElement('div');
-        transcriptionElement.className = 'message bot-message';
-        transcriptionElement.id = 'transcription-message';
-        chatMessages.appendChild(transcriptionElement);
-        
-        const interval = setInterval(() => {
-            if (currentPhrase < phrases.length) {
-                transcriptionElement.textContent = phrases[currentPhrase];
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                currentPhrase++;
-            } else {
-                clearInterval(interval);
-                resolve("Transcrição completa do áudio. Aqui está a resposta da IA baseada no conteúdo.");
-            }
-        }, 1000);
-    });
-}
 
         // Alternar entre modo texto e áudio
         toggleAudio.addEventListener('click', () => {
@@ -590,44 +551,41 @@
         sendAudio.addEventListener('click', sendAudioToAI);
         
         async function sendAudioToAI() {
-    if (audioChunks.length === 0) return;
-    
-    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-    
-    // Mostrar mensagem de áudio do usuário
-    addAudioMessage('user', 'Áudio enviado');
-    
-    // Mostrar que a IA está processando
-    showTypingIndicator();
-    
-    try {
-        // Primeiro simular a transcrição em tempo real
-        const transcription = await simulateRealTimeTranscription(audioBlob);
-        
-        // Depois obter a resposta da IA
-        const response = await queryGroqFree(transcription);
-        
-        // Adicionar resposta da IA
-        addMessage(response, 'bot');
-        
-        // Remover o elemento de transcrição temporária
-        const transcriptionElement = document.getElementById('transcription-message');
-        if (transcriptionElement) {
-            transcriptionElement.remove();
+            if (audioChunks.length === 0) return;
+            
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.wav');
+            
+            // Mostrar mensagem de áudio do usuário
+            addAudioMessage('user', 'Áudio enviado');
+            
+            // Mostrar que a IA está processando
+            showTypingIndicator();
+            
+            try {
+                // Aqui você precisaria implementar o envio do áudio para seu backend
+                // que converteria o áudio em texto usando uma API como a do Google Speech-to-Text
+                // e então enviaria para a Groq API
+                
+                // Simulação - em produção, substitua por uma chamada real ao seu backend
+                const response = await simulateAudioProcessing(audioBlob);
+                
+                // Adicionar resposta da IA
+                addMessage(response, 'bot');
+                
+                // Se você quiser que a IA responda em áudio também:
+                await textToSpeech(response);
+                
+            } catch (error) {
+                console.error("Erro ao processar áudio:", error);
+                addMessage("Ocorreu um erro ao processar seu áudio. Por favor, tente novamente.", 'bot');
+            } finally {
+                hideTypingIndicator();
+                playAudio.disabled = true;
+                sendAudio.disabled = true;
+            }
         }
-        
-        // Se quiser que a IA responda em áudio também
-        await textToSpeech(response);
-        
-    } catch (error) {
-        console.error("Erro ao processar áudio:", error);
-        addMessage("Ocorreu um erro ao processar seu áudio. Por favor, tente novamente.", 'bot');
-    } finally {
-        hideTypingIndicator();
-        playAudio.disabled = true;
-        sendAudio.disabled = true;
-    }
-}
 
         // Simular processamento de áudio (substitua por chamada real ao backend)
         async function simulateAudioProcessing(audioBlob) {
@@ -1390,6 +1348,3 @@ document.getElementById('menuLogout').addEventListener('click', () => {
         window.location.href = 'index.html';
     });
 });
-    </script>
-</body>
-</html>

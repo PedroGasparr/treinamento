@@ -207,7 +207,6 @@
         </div>
         <div class="chat-messages" id="chatMessages">
             <div class="message bot-message">
-                Olá! Sou a Laura assistente IA da GZL Treinamentos. Como posso te ajudar com o treinamento hoje?
             </div>
         </div>
         <div class="typing-indicator" id="typingIndicator">
@@ -364,15 +363,7 @@ async function queryGroqFree(message) {
                                  - Tirar dúvidas sobre o funcionamento dos treinamentos (certificados, prazos, acesso, etc.)
                                  - Orientar sobre como navegar na plataforma
                                  - Fornecer informações sobre suporte técnico
-                                 - e outra duvidas e conteudos fora do sistema, voce pode ter sua propria personalidade e seu nome sera Laura a assistente virtual da GZL Treinamentos
-                                
-                                 Você NÃO PODE:
-                                 - Responder perguntas sobre o conteúdo dos treinamentos
-                                 - Dar respostas de provas ou questionários
-                                 - Realizar qualquer atividade que substitua a realização do treinamento
-                                 
-                                 Se receber perguntas sobre conteúdos, responda:
-                                 "Essa pergunta está relacionada ao conteúdo do treinamento. Por favor, assista às aulas e consulte os materiais fornecidos para obter a resposta correta. Se precisar de ajuda com o funcionamento da plataforma, estou à disposição!"`
+                                 - e outra duvidas e conteudos fora do sistema, voce pode ter sua propria personalidade e seu nome sera Laura a assistente virtual da GZL Treinamentos`
                     },
                     { 
                         role: "user", 
@@ -847,18 +838,72 @@ function sendUserMessage() {
         }
 
         // Mostra o questionário
-        function showQuiz() {
-            renderQuiz();
-            document.getElementById('quizContainer').style.display = 'block';
-            document.getElementById('quizContainerContent').style.display = 'block';
+function showQuiz() {
+    renderQuiz();
+    document.getElementById('quizContainer').style.display = 'block';
+    document.getElementById('quizContainerContent').style.display = 'block';
+    
+    // Desabilita o chat quando o formulário aparece
+    chatIcon.style.display = 'none';
+    chatContainer.style.display = 'none';
+    
+    setTimeout(() => {
+        document.getElementById('quizContainer').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }, 300);
+}
+
+// Mostra conclusão
+function showTrainingCompletion() {
+    document.getElementById('videosContainer').style.display = 'none';
+    document.getElementById('quizContainer').style.display = 'none';
+    
+    const completedAt = new Date(userTrainingProgress.completedAt);
+    const validUntil = new Date(completedAt);
+    validUntil.setFullYear(validUntil.getFullYear() + (currentTrainingData.validity || 1));
+    
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const completedAtStr = completedAt.toLocaleDateString('pt-BR', options);
+    const validUntilStr = validUntil.toLocaleDateString('pt-BR', options);
+    
+    document.getElementById('validityMessage').textContent = 
+        `Treinamento concluído em ${completedAtStr}. Válido até ${validUntilStr}. ` +
+        `Pontuação: ${userTrainingProgress.quizScore}%`;
+    
+    document.getElementById('trainingCompleted').style.display = 'block';
+    document.getElementById('trainingCompleted').scrollIntoView({ behavior: 'smooth' });
+    
+    // Mantém o chat desabilitado após a conclusão
+    chatIcon.style.display = 'none';
+    chatContainer.style.display = 'none';
+}
+
+// Quando a página carrega
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    currentTrainingId = urlParams.get('id');
+    
+    if (!currentTrainingId) {
+        alert('Treinamento não especificado!');
+        window.location.href = 'home.html';
+        return;
+    }
+
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            currentUser = user;
+            document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+            loadTrainingData();
             
-            setTimeout(() => {
-                document.getElementById('quizContainer').scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }, 300);
+            // Mostra o ícone do chat inicialmente
+            chatIcon.style.display = 'flex';
+        } else {
+            window.location.href = 'index.html';
         }
+    });
+});
 
         // Envia o questionário
         function submitQuiz(e) {
