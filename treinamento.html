@@ -62,15 +62,11 @@
             background-color: #f9f9f9;
         }
         
-        .chat-input-area {
+        .chat-input {
+            display: flex;
             padding: 10px;
             border-top: 1px solid #eee;
             background-color: white;
-        }
-        
-        .chat-input {
-            display: flex;
-            margin-bottom: 10px;
         }
         
         .chat-input input {
@@ -120,15 +116,6 @@
             border-bottom-left-radius: 5px;
         }
         
-        .audio-message {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 18px;
-            background-color: #f0f0f0;
-            margin-bottom: 10px;
-        }
-        
         .close-chat {
             cursor: pointer;
             font-size: 20px;
@@ -165,105 +152,6 @@
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-5px); }
         }
-        
-        .audio-button {
-            background-color: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            margin: 0 5px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .audio-button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        #audioTimer {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-        }
-        
-        .recording {
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(234, 67, 53, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); }
-        }
-        
-        .audio-controls {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-        }
-        
-        .audio-buttons-row {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 5px;
-        }
-        
-        .audio-visualizer {
-            width: 100%;
-            height: 30px;
-            margin: 5px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .audio-visualizer-bar {
-            width: 3px;
-            height: 10px;
-            margin: 0 1px;
-            background-color: #4285f4;
-            border-radius: 3px;
-            animation: visualizerAnimation 0.8s infinite ease-in-out alternate;
-        }
-        
-        @keyframes visualizerAnimation {
-            from { height: 5px; }
-            to { height: 20px; }
-        }
-        
-        .play-audio-button {
-            background-color: #34a853;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 5px 15px;
-            margin-top: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .play-audio-button i {
-            margin-right: 5px;
-        }
-        #transcription-message {
-        background-color: #e0f7fa;
-        border-left: 4px solid #00bcd4;
-        animation: pulseOpacity 1.5s infinite;
-    }
-    
-    @keyframes pulseOpacity {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
-    }
     </style>
 </head>
 <body>
@@ -314,12 +202,11 @@
     
     <div class="chat-container" id="chatContainer">
         <div class="chat-header">
-            <span>Assistente IA</span>
+            <span>Laura Assistente virtual </span>
             <span class="close-chat" id="closeChat">&times;</span>
         </div>
         <div class="chat-messages" id="chatMessages">
             <div class="message bot-message">
-                Olá! Eu sou Laura, assistente virtual da GZL Treinamentos. Como posso te ajudar hoje?
             </div>
         </div>
         <div class="typing-indicator" id="typingIndicator">
@@ -327,38 +214,9 @@
             <span></span>
             <span></span>
         </div>
-        <div class="chat-input-area">
-            <div class="audio-controls" id="audioControls">
-                <div class="audio-buttons-row">
-                    <button id="startRecording" class="audio-button">
-                        <i class="material-icons">mic</i>
-                    </button>
-                    <button id="stopRecording" class="audio-button" disabled>
-                        <i class="material-icons">stop</i>
-                    </button>
-                    <button id="playAudio" class="audio-button" disabled>
-                        <i class="material-icons">play_arrow</i>
-                    </button>
-                    <button id="sendAudio" class="audio-button" disabled>
-                        <i class="material-icons">send</i>
-                    </button>
-                </div>
-                <div class="audio-visualizer" id="audioVisualizer">
-                    <div class="audio-visualizer-bar" style="animation-delay: 0s"></div>
-                    <div class="audio-visualizer-bar" style="animation-delay: 0.1s"></div>
-                    <div class="audio-visualizer-bar" style="animation-delay: 0.2s"></div>
-                    <div class="audio-visualizer-bar" style="animation-delay: 0.3s"></div>
-                    <div class="audio-visualizer-bar" style="animation-delay: 0.4s"></div>
-                </div>
-                <div id="audioTimer">00:00</div>
-            </div>
-            <div class="chat-input">
-                <button id="toggleAudio" class="audio-button" style="margin-right: 10px;">
-                    <i class="material-icons" id="toggleAudioIcon">keyboard_voice</i>
-                </button>
-                <input type="text" id="userInput" placeholder="Digite sua dúvida..." autocomplete="off">
-                <button id="sendMessage"><i class="material-icons">send</i></button>
-            </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Digite sua dúvida..." autocomplete="off">
+            <button id="sendMessage"><i class="material-icons">send</i></button>
         </div>
     </div>
 
@@ -393,21 +251,7 @@
         let videoPlayers = [];
         let currentVideoIndex = 0;
 
-        // Variáveis para controle de áudio
-        let mediaRecorder;
-        let audioChunks = [];
-        let recordingStartTime;
-        let recordingTimer;
-        let audioContext;
-        let analyser;
-        let microphone;
-        let dataArray;
-        let animationId;
-        let isAudioMode = false;
-        let audioQueue = [];
-        let isPlayingAudio = false;
-
-        // Elementos do Chat IA
+        // Configuração do Chat IA
         const chatIcon = document.getElementById('chatIcon');
         const chatContainer = document.getElementById('chatContainer');
         const closeChat = document.getElementById('closeChat');
@@ -415,15 +259,6 @@
         const userInput = document.getElementById('userInput');
         const chatMessages = document.getElementById('chatMessages');
         const typingIndicator = document.getElementById('typingIndicator');
-        const toggleAudio = document.getElementById('toggleAudio');
-        const toggleAudioIcon = document.getElementById('toggleAudioIcon');
-        const audioControls = document.getElementById('audioControls');
-        const startRecording = document.getElementById('startRecording');
-        const stopRecording = document.getElementById('stopRecording');
-        const playAudio = document.getElementById('playAudio');
-        const sendAudio = document.getElementById('sendAudio');
-        const audioTimer = document.getElementById('audioTimer');
-        const audioVisualizer = document.getElementById('audioVisualizer');
 
         // Alternar visibilidade do chat
         chatIcon.addEventListener('click', toggleChat);
@@ -435,259 +270,6 @@
                 userInput.focus();
             }
         }
-        function simulateRealTimeTranscription(audioBlob) {
-    return new Promise((resolve) => {
-        // Em produção, substitua por um serviço real de STT como Google Speech-to-Text
-        const phrases = [
-            "Obrigado pelo seu áudio",
-            "Estou processando sua mensagem",
-            "Aguarde um momento",
-            "Quase terminando",
-            "Transcrição completa"
-        ];
-        
-        let currentPhrase = 0;
-        const transcriptionElement = document.createElement('div');
-        transcriptionElement.className = 'message bot-message';
-        transcriptionElement.id = 'transcription-message';
-        chatMessages.appendChild(transcriptionElement);
-        
-        const interval = setInterval(() => {
-            if (currentPhrase < phrases.length) {
-                transcriptionElement.textContent = phrases[currentPhrase];
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                currentPhrase++;
-            } else {
-                clearInterval(interval);
-                resolve("Transcrição completa do áudio. Aqui está a resposta da IA baseada no conteúdo.");
-            }
-        }, 1000);
-    });
-}
-
-        // Alternar entre modo texto e áudio
-        toggleAudio.addEventListener('click', () => {
-            isAudioMode = !isAudioMode;
-            if (isAudioMode) {
-                toggleAudioIcon.textContent = 'keyboard';
-                audioControls.style.display = 'flex';
-                userInput.placeholder = "Ou grave um áudio...";
-                initAudioContext();
-            } else {
-                toggleAudioIcon.textContent = 'keyboard_voice';
-                audioControls.style.display = 'none';
-                userInput.placeholder = "Digite sua dúvida...";
-                stopRecordingAudio();
-            }
-        });
-
-        // Inicializar contexto de áudio
-        function initAudioContext() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 32;
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
-            }
-        }
-
-        // Iniciar gravação de áudio
-        startRecording.addEventListener('click', startRecordingAudio);
-        
-        async function startRecordingAudio() {
-            try {
-                audioChunks = [];
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                
-                // Conectar o microfone ao analisador para visualização
-                microphone = audioContext.createMediaStreamSource(stream);
-                microphone.connect(analyser);
-                
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        audioChunks.push(event.data);
-                    }
-                };
-                
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    
-                    // Criar elemento de áudio para pré-visualização
-                    const previewAudio = new Audio(audioUrl);
-                    playAudio.onclick = () => {
-                        previewAudio.play();
-                    };
-                    
-                    playAudio.disabled = false;
-                    sendAudio.disabled = false;
-                    
-                    // Parar o stream
-                    stream.getTracks().forEach(track => track.stop());
-                    
-                    // Parar a visualização
-                    cancelAnimationFrame(animationId);
-                    audioVisualizer.style.display = 'none';
-                };
-                
-                mediaRecorder.start();
-                startRecording.classList.add('recording');
-                stopRecording.disabled = false;
-                playAudio.disabled = true;
-                sendAudio.disabled = true;
-                
-                // Iniciar temporizador
-                recordingStartTime = Date.now();
-                updateTimer();
-                recordingTimer = setInterval(updateTimer, 1000);
-                
-                // Mostrar visualizador de áudio
-                audioVisualizer.style.display = 'flex';
-                visualizeAudio();
-                
-            } catch (error) {
-                console.error("Erro ao acessar o microfone:", error);
-                addMessage("Não foi possível acessar o microfone. Verifique as permissões.", 'bot');
-            }
-        }
-
-        // Atualizar temporizador de gravação
-        function updateTimer() {
-            const seconds = Math.floor((Date.now() - recordingStartTime) / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            audioTimer.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-
-        // Visualizar áudio
-        function visualizeAudio() {
-            analyser.getByteFrequencyData(dataArray);
-            
-            const bars = audioVisualizer.querySelectorAll('.audio-visualizer-bar');
-            bars.forEach((bar, i) => {
-                const value = dataArray[i] || 0;
-                const height = Math.max(5, value / 2);
-                bar.style.height = `${height}px`;
-            });
-            
-            animationId = requestAnimationFrame(visualizeAudio);
-        }
-
-        // Parar gravação de áudio
-        stopRecording.addEventListener('click', stopRecordingAudio);
-        
-        function stopRecordingAudio() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                clearInterval(recordingTimer);
-                startRecording.classList.remove('recording');
-                stopRecording.disabled = true;
-            }
-        }
-
-        // Enviar áudio para a IA
-        sendAudio.addEventListener('click', sendAudioToAI);
-        
-        async function sendAudioToAI() {
-    if (audioChunks.length === 0) return;
-    
-    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-    
-    // Mostrar mensagem de áudio do usuário
-    addAudioMessage('user', 'Áudio enviado');
-    
-    // Mostrar que a IA está processando
-    showTypingIndicator();
-    
-    try {
-        // Primeiro simular a transcrição em tempo real
-        const transcription = await simulateRealTimeTranscription(audioBlob);
-        
-        // Depois obter a resposta da IA
-        const response = await queryGroqFree(transcription);
-        
-        // Adicionar resposta da IA
-        addMessage(response, 'bot');
-        
-        // Remover o elemento de transcrição temporária
-        const transcriptionElement = document.getElementById('transcription-message');
-        if (transcriptionElement) {
-            transcriptionElement.remove();
-        }
-        
-        // Se quiser que a IA responda em áudio também
-        await textToSpeech(response);
-        
-    } catch (error) {
-        console.error("Erro ao processar áudio:", error);
-        addMessage("Ocorreu um erro ao processar seu áudio. Por favor, tente novamente.", 'bot');
-    } finally {
-        hideTypingIndicator();
-        playAudio.disabled = true;
-        sendAudio.disabled = true;
-    }
-}
-
-        // Simular processamento de áudio (substitua por chamada real ao backend)
-        async function simulateAudioProcessing(audioBlob) {
-            // Em um ambiente real, você enviaria o áudio para seu backend
-            // que converteria para texto e enviaria para a Groq API
-            // Aqui estamos apenas simulando uma resposta
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve("Obrigado pelo seu áudio! Aqui está uma resposta simulada. Em produção, isso seria convertido de áudio para texto e processado pela IA.");
-                }, 1500);
-            });
-        }
-
-        // Converter texto em fala (resposta em áudio)
-        async function textToSpeech(text) {
-            if (!('speechSynthesis' in window)) {
-                console.log("API de síntese de fala não suportada");
-                return;
-            }
-            
-            return new Promise((resolve) => {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'pt-BR';
-                utterance.rate = 1.0;
-                utterance.pitch = 1.0;
-                
-                // Adicionar mensagem de áudio do bot
-                addAudioMessage('bot', 'Resposta em áudio');
-                
-                utterance.onend = () => {
-                    resolve();
-                };
-                
-                speechSynthesis.speak(utterance);
-            });
-        }
-
-        // Adicionar mensagem de áudio ao chat
-        function addAudioMessage(sender, label) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}-message audio-message`;
-            
-            messageDiv.innerHTML = `
-                <i class="material-icons">mic</i>
-                <span style="margin-left: 8px;">${label}</span>
-                <button class="play-audio-button" onclick="playLastAudio('${sender}')">
-                    <i class="material-icons">play_arrow</i>
-                    Ouvir
-                </button>
-            `;
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Função global para reproduzir o último áudio (simulação)
-        window.playLastAudio = function(sender) {
-            // Em produção, isso reproduziria o áudio real gravado ou gerado
-            alert(`Reproduzindo áudio ${sender === 'user' ? 'enviado' : 'recebido'}`);
-        };
 
         // Adicionar mensagem ao chat
         function addMessage(text, sender) {
@@ -696,11 +278,6 @@
             messageDiv.textContent = text;
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // Se for uma mensagem do bot e estiver no modo áudio, converter para fala
-            if (sender === 'bot' && isAudioMode) {
-                textToSpeech(text);
-            }
         }
 
         // Mostrar indicador de digitação
@@ -713,71 +290,131 @@
         function hideTypingIndicator() {
             typingIndicator.style.display = 'none';
         }
+        // Função principal que envia mensagens para a IA e exibe a resposta
+async function sendToAI(message) {
+    // Mostra um indicador de "digitando" (opcional)
+    showTypingIndicator(); 
+    
+    try {
+        // Chama a API Groq
+        const respostaIA = await queryGroqFree(message);
+        
+        // Exibe a resposta no chat (substitua por sua função de UI)
+        addMessage(respostaIA, 'bot');
+    } catch (error) {
+        console.error("Erro ao chamar a IA:", error);
+        addMessage("⚠️ Erro ao acessar a IA. Tente novamente.", 'bot');
+    } finally {
+        // Esconde o indicador de "digitando"
+        hideTypingIndicator();
+    }
+}
+
+// Função para enviar mensagem do usuário (chamada pelo botão)
+function sendUserMessage() {
+    const userInput = document.getElementById("user-input").value;
+    if (!userInput.trim()) return;
+
+    // Exibe a mensagem do usuário no chat
+    addMessage(userInput, 'user');
+    
+    // Limpa o campo de input
+    document.getElementById("user-input").value = "";
+    
+    // Chama a IA
+    sendToAI(userInput);
+}
 
         // Função para buscar a API Key do Firebase
-        async function getApiKeyFromFirebase() {
-            try {
-                const snapshot = await database.ref('apiKeys/groq').once('value');
-                const apiData = snapshot.val();
-                
-                if (apiData && apiData.key) {
-                    return apiData.key;
-                } else {
-                    throw new Error('API Key não encontrada no banco de dados');
-                }
-            } catch (error) {
-                console.error('Erro ao buscar API Key:', error);
-                throw error;
-            }
+async function getApiKeyFromFirebase() {
+    try {
+        const snapshot = await database.ref('apiKeys/groq').once('value');
+        const apiData = snapshot.val();
+        
+        if (apiData && apiData.key) {
+            return apiData.key;
+        } else {
+            throw new Error('API Key não encontrada no banco de dados');
         }
+    } catch (error) {
+        console.error('Erro ao buscar API Key:', error);
+        throw error;
+    }
+}
 
-        // Enviar mensagem para a IA (versão ajustada)
-        async function queryGroqFree(message) {
-            try {
-                // Busca a API Key do Firebase
-                const apiKey = await getApiKeyFromFirebase();
-                
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json",
+// Enviar mensagem para a IA (versão ajustada)
+async function queryGroqFree(message) {
+    try {
+        // Busca a API Key do Firebase
+        const apiKey = await getApiKeyFromFirebase();
+        
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                model: "llama3-70b-8192",
+                messages: [
+                    {
+                        role: "system",
+                        content: `Você é Laura assistente virtual da GZL Treinamentos. Sua função é:
+                                 - Tirar dúvidas sobre o funcionamento dos treinamentos (certificados, prazos, acesso, etc.)
+                                 - Orientar sobre como navegar na plataforma
+                                 - Fornecer informações sobre suporte técnico
+                                 - e outra duvidas e conteudos fora do sistema, voce pode ter sua propria personalidade e seu nome sera Laura a assistente virtual da GZL Treinamentos`
                     },
-                    body: JSON.stringify({
-                        model: "llama3-70b-8192",
-                        messages: [
-                            {
-                                role: "system",
-                                content: `Você é Laura assistente virtual da GZL Treinamentos. Sua função é:
-                                         - Tirar dúvidas sobre o funcionamento dos treinamentos (certificados, prazos, acesso, etc.)
-                                         - Orientar sobre como navegar na plataforma
-                                         - Fornecer informações sobre suporte técnico
-                                         - e outra duvidas e conteudos fora do sistema, voce pode ter sua propria personalidade e seu nome sera Laura a assistente virtual da GZL Treinamentos`
-                            },
-                            { 
-                                role: "user", 
-                                content: message 
-                            }
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 300
-                    }),
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Erro na API: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                return data.choices[0]?.message?.content;
-                
-            } catch (error) {
-                console.error('Erro ao consultar a IA:', error);
-                return "Desculpe, estou tendo problemas para me conectar ao serviço. Por favor, tente novamente mais tarde.";
-            }
+                    { 
+                        role: "user", 
+                        content: message 
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 300
+            }),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro na API: ${response.status}`);
         }
+        
+        const data = await response.json();
+        return data.choices[0]?.message?.content;
+        
+    } catch (error) {
+        console.error('Erro ao consultar a IA:', error);
+        return "Desculpe, estou tendo problemas para me conectar ao serviço. Por favor, tente novamente mais tarde.";
+    }
+}
 
-        // Enviar mensagem do usuário (versão ajustada)
+// Enviar mensagem do usuário (versão ajustada)
+function sendUserMessage() {
+    const message = userInput.value.trim();
+    if (!message) return;
+
+    addMessage(message, 'user');
+    userInput.value = '';
+    
+    // Mostrar indicador de digitação
+    showTypingIndicator();
+    
+    // Enviar para a IA
+    queryGroqFree(message)
+        .then(response => {
+            addMessage(response, 'bot');
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            addMessage("Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.", 'bot');
+        })
+        .finally(() => {
+            hideTypingIndicator();
+        });
+}
+
+
+        // Enviar mensagem do usuário
         function sendUserMessage() {
             const message = userInput.value.trim();
             if (!message) return;
@@ -785,21 +422,8 @@
             addMessage(message, 'user');
             userInput.value = '';
             
-            // Mostrar indicador de digitação
-            showTypingIndicator();
-            
             // Enviar para a IA
-            queryGroqFree(message)
-                .then(response => {
-                    addMessage(response, 'bot');
-                })
-                .catch(error => {
-                    console.error("Erro:", error);
-                    addMessage("Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.", 'bot');
-                })
-                .finally(() => {
-                    hideTypingIndicator();
-                });
+            sendToAI(message);
         }
 
         // Event listeners para o chat
@@ -832,6 +456,7 @@
             });
         });
 
+        // [O restante do seu código JavaScript permanece exatamente igual...]
         // Carrega os dados do treinamento
         function loadTrainingData() {
             database.ref(`trainings/${currentTrainingId}`).once('value').then((trainingSnapshot) => {
@@ -1042,354 +667,317 @@
         }
 
         // Manipula a conclusão do vídeo
-        // Manipula a conclusão do vídeo
-function handleVideoCompletion(videoNumber) {
-    // Mostrar mensagem de conclusão
-    const videoContainer = document.getElementById(`video${videoNumber}-container`);
-    if (videoContainer) {
-        const completionMessage = document.createElement('div');
-        completionMessage.className = 'video-completion-message';
-        completionMessage.innerHTML = `
-            <i class="material-icons">check_circle</i>
-            <span>Aula concluída com sucesso!</span>
-        `;
-        videoContainer.appendChild(completionMessage);
-    }
-
-    // Verificar se há próximo vídeo
-    const nextVideoNumber = videoNumber + 1;
-    if (currentTrainingData.videos && nextVideoNumber <= currentTrainingData.videos.length) {
-        // Mostrar loading para o próximo vídeo
-        const nextVideoLoading = document.getElementById(`videoLoading${nextVideoNumber}`);
-        if (nextVideoLoading) {
-            nextVideoLoading.style.display = 'block';
-        }
-
-        // Atualizar progresso no banco de dados para marcar o próximo vídeo como disponível
-        database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}/video${nextVideoNumber}`).update({
-            available: true
-        }).then(() => {
-            // Atualizar localmente
-            if (!userTrainingProgress[`video${nextVideoNumber}`]) {
-                userTrainingProgress[`video${nextVideoNumber}`] = {};
+        function handleVideoCompletion(videoNumber) {
+            if (videoNumber >= currentTrainingData.videos.length) {
+                if (shouldShowQuiz()) {
+                    showQuiz();
+                }
+                return;
             }
-            userTrainingProgress[`video${nextVideoNumber}`].available = true;
-
-            // Configurar o próximo vídeo após um pequeno delay
+            
+            const nextVideoNumber = videoNumber + 1;
+            
+            const lockedMessage = document.getElementById(`locked-message${nextVideoNumber}`);
+            const nextVideoFrame = document.getElementById(`video${nextVideoNumber}`);
+            
+            if (lockedMessage) lockedMessage.style.display = 'none';
+            if (nextVideoFrame) nextVideoFrame.classList.remove('video-locked');
+            
+            document.getElementById(`videoLoading${videoNumber}`).style.display = 'flex';
+            
             setTimeout(() => {
-                const nextVideo = currentTrainingData.videos[nextVideoNumber - 1];
-                setupVideoPlayer(nextVideoNumber, nextVideo.url);
+                document.getElementById(`video${nextVideoNumber}-container`).scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
                 
-                // Remover loading
-                if (nextVideoLoading) {
-                    nextVideoLoading.style.display = 'none';
-                }
-                
-                // Atualizar status na UI
-                const nextVideoContainer = document.getElementById(`video${nextVideoNumber}-container`);
-                if (nextVideoContainer) {
-                    const statusIcon = nextVideoContainer.querySelector('.video-status i');
-                    if (statusIcon) {
-                        statusIcon.textContent = 'play_circle_outline';
-                        statusIcon.className = 'material-icons pending';
-                    }
+                setTimeout(() => {
+                    document.getElementById(`videoLoading${videoNumber}`).style.display = 'none';
                     
-                    // Remover mensagem de bloqueio se existir
-                    const lockedMessage = document.getElementById(`locked-message${nextVideoNumber}`);
-                    if (lockedMessage) {
-                        lockedMessage.remove();
+                    if (videoPlayers[nextVideoNumber]) {
+                        videoPlayers[nextVideoNumber].playVideo();
+                    } else {
+                        setupVideoPlayer(nextVideoNumber, currentTrainingData.videos[nextVideoNumber-1].url);
+                    }
+                }, 500);
+            }, 800);
+        }
+
+        // Marca vídeo como completado
+        function markVideoAsCompleted(videoNumber) {
+            return new Promise((resolve, reject) => {
+                if (userTrainingProgress[`video${videoNumber}`]?.progress === 100) {
+                    resolve();
+                    return;
+                }
+                
+                const updates = {
+                    [`video${videoNumber}/completedAt`]: new Date().toISOString(),
+                    [`video${videoNumber}/progress`]: 100,
+                    [`video${videoNumber}/userEmail`]: currentUser.email
+                };
+                
+                if (videoNumber === 1 && !userTrainingProgress.startedAt) {
+                    updates.startedAt = new Date().toISOString();
+                    updates.status = 'in_progress';
+                }
+                
+                if (videoNumber < currentTrainingData.videos.length) {
+                    updates[`video${videoNumber+1}/available`] = true;
+                }
+                
+                database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(updates)
+                    .then(() => {
+                        if (!userTrainingProgress[`video${videoNumber}`]) {
+                            userTrainingProgress[`video${videoNumber}`] = {};
+                        }
+                        userTrainingProgress[`video${videoNumber}`].progress = 100;
+                        userTrainingProgress[`video${videoNumber}`].completedAt = updates[`video${videoNumber}/completedAt`];
+                        
+                        if (videoNumber === 1) {
+                            userTrainingProgress.startedAt = updates.startedAt;
+                            userTrainingProgress.status = 'in_progress';
+                        }
+                        
+                        if (videoNumber < currentTrainingData.videos.length) {
+                            if (!userTrainingProgress[`video${videoNumber+1}`]) {
+                                userTrainingProgress[`video${videoNumber+1}`] = {};
+                            }
+                            userTrainingProgress[`video${videoNumber+1}`].available = true;
+                        }
+                        
+                        updateVideoStatus(videoNumber);
+                        resolve();
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao atualizar progresso:", error);
+                        reject(error);
+                    });
+            });
+        }
+
+        // Atualiza status do vídeo
+        function updateVideoStatus(videoNumber) {
+            const statusIcon = document.querySelector(`#video${videoNumber}-container .material-icons`);
+            if (statusIcon) {
+                statusIcon.textContent = 'check_circle';
+                statusIcon.classList.remove('pending', 'locked');
+                statusIcon.classList.add('completed');
+            }
+        }
+
+        // Verifica se deve mostrar o questionário
+        function shouldShowQuiz() {
+            if (!currentTrainingData.videos || currentTrainingData.videos.length === 0) {
+                return true;
+            }
+            
+            return currentTrainingData.videos.every((_, index) => {
+                const videoNumber = index + 1;
+                return userTrainingProgress[`video${videoNumber}`]?.progress === 100;
+            });
+        }
+
+        // Renderiza o questionário
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.innerHTML = '';
+            
+            if (!currentTrainingData.questions || currentTrainingData.questions.length === 0) {
+                quizContainer.innerHTML = '<p>Este treinamento não possui questionário.</p>';
+                return;
+            }
+            
+            const quizDiv = document.createElement('div');
+            quizDiv.className = 'quiz-container';
+            quizDiv.id = 'quizContainerContent';
+            
+            quizDiv.innerHTML = `
+                <h2>Prova Final - ${currentTrainingData.name}</h2>
+                <p>Responda as questões abaixo para finalizar o treinamento:</p>
+                <form id="quizForm"></form>
+            `;
+            
+            const quizForm = quizDiv.querySelector('#quizForm');
+            
+            currentTrainingData.questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-question';
+                
+                let optionsHtml = '';
+                question.options.forEach((option, i) => {
+                    if (option) {
+                        const optionLetter = String.fromCharCode(97 + i);
+                        optionsHtml += `
+                            <div class="quiz-option">
+                                <input type="radio" name="q${index}" value="${optionLetter}" id="q${index}_opt${i}" required>
+                                <label for="q${index}_opt${i}">${optionLetter.toUpperCase()}) ${option}</label>
+                            </div>
+                        `;
+                    }
+                });
+                
+                questionDiv.innerHTML = `
+                    <h4>${index + 1}. ${question.text}</h4>
+                    <div class="quiz-options">
+                        ${optionsHtml}
+                    </div>
+                `;
+                
+                quizForm.appendChild(questionDiv);
+            });
+            
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit';
+            submitButton.className = 'submit-quiz';
+            submitButton.innerHTML = '<i class="material-icons">send</i> Enviar Prova';
+            quizForm.appendChild(submitButton);
+            
+            quizContainer.appendChild(quizDiv);
+            quizForm.addEventListener('submit', (e) => submitQuiz(e));
+        }
+
+        // Mostra o questionário
+        function showQuiz() {
+            renderQuiz();
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('quizContainerContent').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('quizContainer').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 300);
+        }
+
+        // Envia o questionário
+        function submitQuiz(e) {
+            e.preventDefault();
+            
+            if (userTrainingProgress.quizCompleted) {
+                showTrainingCompletion();
+                return;
+            }
+            
+            const score = calculateQuizScore();
+            
+            if (score < 80) {
+                alert(`Você acertou ${score}% das questões. É necessário acertar no mínimo 80% para concluir o treinamento. Você precisará refazer o treinamento.`);
+                
+                const resetUpdates = {};
+                
+                if (currentTrainingData.videos && currentTrainingData.videos.length > 0) {
+                    resetUpdates['video1/progress'] = 0;
+                    resetUpdates['video1/completedAt'] = null;
+                    resetUpdates['video1/available'] = true;
+                    
+                    for (let i = 2; i <= currentTrainingData.videos.length; i++) {
+                        resetUpdates[`video${i}/progress`] = 0;
+                        resetUpdates[`video${i}/completedAt`] = null;
+                        resetUpdates[`video${i}/available`] = false;
                     }
                 }
-            }, 1500);
-        });
-    } else {
-        // Se não há mais vídeos, verificar se pode mostrar o quiz
-        if (shouldShowQuiz()) {
-            showQuiz();
-        }
-    }
-}
-
-// Marca vídeo como concluído no banco de dados
-function markVideoAsCompleted(videoNumber) {
-    const updates = {};
-    updates[`video${videoNumber}/progress`] = 100;
-    updates[`video${videoNumber}/completedAt`] = firebase.database.ServerValue.TIMESTAMP;
-
-    // Se for o primeiro vídeo, marcar o treinamento como iniciado
-    if (videoNumber === 1 && !userTrainingProgress.startedAt) {
-        updates['startedAt'] = firebase.database.ServerValue.TIMESTAMP;
-    }
-
-    return database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(updates)
-        .then(() => {
-            // Atualizar localmente
-            if (!userTrainingProgress[`video${videoNumber}`]) {
-                userTrainingProgress[`video${videoNumber}`] = {};
-            }
-            userTrainingProgress[`video${videoNumber}`].progress = 100;
-            userTrainingProgress[`video${videoNumber}`].completedAt = Date.now();
-            
-            if (videoNumber === 1 && !userTrainingProgress.startedAt) {
-                userTrainingProgress.startedAt = Date.now();
-            }
-        });
-}
-
-// Verifica se deve mostrar o quiz
-function shouldShowQuiz() {
-    // Verificar se já foi concluído
-    if (userTrainingProgress.quizCompleted) {
-        return false;
-    }
-
-    // Verificar se todos os vídeos foram concluídos
-    if (currentTrainingData.videos && currentTrainingData.videos.length > 0) {
-        for (let i = 0; i < currentTrainingData.videos.length; i++) {
-            const videoNumber = i + 1;
-            if (!userTrainingProgress[`video${videoNumber}`] || userTrainingProgress[`video${videoNumber}`].progress !== 100) {
-                return false;
-            }
-        }
-    }
-
-    // Verificar se o quiz existe
-    return currentTrainingData.quiz && currentTrainingData.quiz.questions && currentTrainingData.quiz.questions.length > 0;
-}
-
-// Mostra o quiz
-function showQuiz() {
-    const quizContainer = document.getElementById('quizContainer');
-    const videosContainer = document.getElementById('videosContainer');
-    
-    // Esconder vídeos
-    videosContainer.style.display = 'none';
-    
-    // Mostrar quiz
-    quizContainer.style.display = 'block';
-    quizContainer.innerHTML = '';
-    
-    // Adicionar título
-    const quizTitle = document.createElement('h2');
-    quizTitle.textContent = 'Prova Final';
-    quizContainer.appendChild(quizTitle);
-    
-    // Adicionar descrição
-    const quizDescription = document.createElement('p');
-    quizDescription.textContent = 'Responda corretamente às perguntas abaixo para concluir o treinamento.';
-    quizContainer.appendChild(quizDescription);
-    
-    // Criar formulário do quiz
-    const quizForm = document.createElement('form');
-    quizForm.id = 'quizForm';
-    
-    // Adicionar perguntas
-    currentTrainingData.quiz.questions.forEach((question, index) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.className = 'quiz-question';
-        
-        const questionText = document.createElement('h3');
-        questionText.textContent = `${index + 1}. ${question.question}`;
-        questionDiv.appendChild(questionText);
-        
-        // Adicionar opções
-        question.options.forEach((option, optionIndex) => {
-            const optionDiv = document.createElement('div');
-            optionDiv.className = 'quiz-option';
-            
-            const input = document.createElement('input');
-            input.type = 'radio';
-            input.id = `q${index}_o${optionIndex}`;
-            input.name = `question_${index}`;
-            input.value = optionIndex;
-            
-            const label = document.createElement('label');
-            label.htmlFor = `q${index}_o${optionIndex}`;
-            label.textContent = option;
-            
-            optionDiv.appendChild(input);
-            optionDiv.appendChild(label);
-            questionDiv.appendChild(optionDiv);
-        });
-        
-        quizForm.appendChild(questionDiv);
-    });
-    
-    // Adicionar botão de envio
-    const submitButton = document.createElement('button');
-    submitButton.type = 'button';
-    submitButton.textContent = 'Enviar Respostas';
-    submitButton.addEventListener('click', submitQuiz);
-    
-    quizForm.appendChild(submitButton);
-    quizContainer.appendChild(quizForm);
-}
-
-// Submete o quiz
-function submitQuiz() {
-    const quizForm = document.getElementById('quizForm');
-    const inputs = quizForm.querySelectorAll('input[type="radio"]:checked');
-    
-    // Verificar se todas as perguntas foram respondidas
-    if (inputs.length < currentTrainingData.quiz.questions.length) {
-        alert('Por favor, responda todas as perguntas antes de enviar.');
-        return;
-    }
-    
-    // Calcular pontuação
-    let score = 0;
-    const answers = [];
-    
-    currentTrainingData.quiz.questions.forEach((question, index) => {
-        const selectedOption = quizForm.querySelector(`input[name="question_${index}"]:checked`).value;
-        answers.push(parseInt(selectedOption));
-        
-        if (parseInt(selectedOption) === question.correctAnswer) {
-            score++;
-        }
-    });
-    
-    // Verificar se passou
-    const passingScore = currentTrainingData.quiz.passingScore || 
-                        Math.ceil(currentTrainingData.quiz.questions.length * 0.7);
-    const passed = score >= passingScore;
-    
-    // Atualizar no banco de dados
-    const updates = {
-        quizCompleted: true,
-        quizScore: score,
-        quizAnswers: answers,
-        completedAt: firebase.database.ServerValue.TIMESTAMP
-    };
-    
-    if (passed) {
-        updates.status = 'completed';
-    } else {
-        updates.status = 'failed';
-    }
-    
-    database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(updates)
-        .then(() => {
-            // Atualizar localmente
-            userTrainingProgress.quizCompleted = true;
-            userTrainingProgress.quizScore = score;
-            userTrainingProgress.quizAnswers = answers;
-            userTrainingProgress.completedAt = Date.now();
-            userTrainingProgress.status = passed ? 'completed' : 'failed';
-            
-            // Mostrar resultado
-            showQuizResult(passed, score, currentTrainingData.quiz.questions.length);
-        })
-        .catch(error => {
-            console.error("Erro ao salvar quiz:", error);
-            alert('Ocorreu um erro ao salvar suas respostas. Por favor, tente novamente.');
-        });
-}
-
-// Mostra o resultado do quiz
-function showQuizResult(passed, score, totalQuestions) {
-    const quizContainer = document.getElementById('quizContainer');
-    quizContainer.innerHTML = '';
-    
-    const resultDiv = document.createElement('div');
-    resultDiv.className = passed ? 'quiz-passed' : 'quiz-failed';
-    
-    const resultIcon = document.createElement('i');
-    resultIcon.className = 'material-icons';
-    resultIcon.textContent = passed ? 'check_circle' : 'error';
-    
-    const resultTitle = document.createElement('h2');
-    resultTitle.textContent = passed ? 'Parabéns! Você passou no teste.' : 'Você não atingiu a pontuação mínima.';
-    
-    const resultScore = document.createElement('p');
-    resultScore.textContent = `Sua pontuação: ${score} de ${totalQuestions} (${Math.round((score/totalQuestions)*100)}%)`;
-    
-    const resultMessage = document.createElement('p');
-    resultMessage.textContent = passed ? 
-        'Você concluiu com sucesso este treinamento. Seu certificado estará disponível em seu perfil.' :
-        'Você pode tentar novamente após revisar o material.';
-    
-    resultDiv.appendChild(resultIcon);
-    resultDiv.appendChild(resultTitle);
-    resultDiv.appendChild(resultScore);
-    resultDiv.appendChild(resultMessage);
-    
-    if (!passed) {
-        const retryButton = document.createElement('button');
-        retryButton.textContent = 'Tentar Novamente';
-        retryButton.addEventListener('click', () => {
-            // Resetar progresso do quiz
-            database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update({
-                quizCompleted: false,
-                quizScore: null,
-                quizAnswers: null,
-                completedAt: null,
-                status: 'in_progress'
-            }).then(() => {
-                // Atualizar localmente
-                userTrainingProgress.quizCompleted = false;
-                userTrainingProgress.quizScore = null;
-                userTrainingProgress.quizAnswers = null;
-                userTrainingProgress.completedAt = null;
-                userTrainingProgress.status = 'in_progress';
                 
-                // Mostrar quiz novamente
-                showQuiz();
+                resetUpdates.quizCompleted = false;
+                resetUpdates.quizScore = null;
+                resetUpdates.quizAnswers = null;
+                resetUpdates.status = 'in_progress';
+                
+                database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(resetUpdates)
+                    .then(() => {
+                        window.location.reload();
+                    });
+                return;
+            }
+            
+            const updates = {
+                quizCompleted: true,
+                quizScore: score,
+                quizAnswers: getQuizAnswers(),
+                completedAt: new Date().toISOString(),
+                status: 'completed'
+            };
+            
+            database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(updates)
+                .then(() => {
+                    Object.assign(userTrainingProgress, updates);
+                    showTrainingCompletion();
+                });
+        }
+
+        // Calcula a pontuação
+        function calculateQuizScore() {
+            let correctAnswers = 0;
+            
+            currentTrainingData.questions.forEach((question, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selectedOption && selectedOption.value === question.correctAnswer.toLowerCase()) {
+                    correctAnswers++;
+                }
+            });
+            
+            return Math.round((correctAnswers / currentTrainingData.questions.length) * 100);
+        }
+
+        // Obtém as respostas
+        function getQuizAnswers() {
+            const answers = {};
+            
+            currentTrainingData.questions.forEach((_, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selectedOption) {
+                    answers[`q${index}`] = selectedOption.value;
+                }
+            });
+            
+            return answers;
+        }
+
+        // Mostra conclusão
+        function showTrainingCompletion() {
+            document.getElementById('videosContainer').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'none';
+            
+            const completedAt = new Date(userTrainingProgress.completedAt);
+            const validUntil = new Date(completedAt);
+            validUntil.setFullYear(validUntil.getFullYear() + (currentTrainingData.validity || 1));
+            
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            const completedAtStr = completedAt.toLocaleDateString('pt-BR', options);
+            const validUntilStr = validUntil.toLocaleDateString('pt-BR', options);
+            
+            document.getElementById('validityMessage').textContent = 
+                `Treinamento concluído em ${completedAtStr}. Válido até ${validUntilStr}. ` +
+                `Pontuação: ${userTrainingProgress.quizScore}%`;
+            
+            document.getElementById('trainingCompleted').style.display = 'block';
+            document.getElementById('trainingCompleted').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Navegação
+        document.getElementById('menuHome').addEventListener('click', () => {
+            window.location.href = 'home.html';
+        });
+
+        document.getElementById('menuProfile').addEventListener('click', () => {
+            window.location.href = 'perfil.html';
+        });
+
+        document.getElementById('menuCompleted').addEventListener('click', () => {
+            window.location.href = 'concluidos.html';
+        });
+
+        document.getElementById('menuLogout').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
             });
         });
-        resultDiv.appendChild(retryButton);
-    }
-    
-    quizContainer.appendChild(resultDiv);
-    
-    // Se passou, mostrar tela de conclusão
-    if (passed) {
-        showTrainingCompletion();
-    }
-}
 
-// Mostra a tela de conclusão do treinamento
-function showTrainingCompletion() {
-    const trainingCompleted = document.getElementById('trainingCompleted');
-    const videosContainer = document.getElementById('videosContainer');
-    const quizContainer = document.getElementById('quizContainer');
-    
-    // Esconder outros elementos
-    videosContainer.style.display = 'none';
-    quizContainer.style.display = 'none';
-    
-    // Mostrar tela de conclusão
-    trainingCompleted.style.display = 'block';
-    
-    // Calcular validade do certificado
-    if (currentTrainingData.validityMonths) {
-        const completedDate = new Date(userTrainingProgress.completedAt || Date.now());
-        const expiryDate = new Date(completedDate);
-        expiryDate.setMonth(expiryDate.getMonth() + currentTrainingData.validityMonths);
-        
-        const validityMessage = document.getElementById('validityMessage');
-        validityMessage.textContent = `Seu certificado é válido por ${currentTrainingData.validityMonths} meses, até ${expiryDate.toLocaleDateString('pt-BR')}.`;
-    }
-}
-
-// Event listeners para o menu
-document.getElementById('menuHome').addEventListener('click', () => {
-    window.location.href = 'home.html';
-});
-
-document.getElementById('menuProfile').addEventListener('click', () => {
-    window.location.href = 'profile.html';
-});
-
-document.getElementById('menuCompleted').addEventListener('click', () => {
-    window.location.href = 'completed.html';
-});
-
-document.getElementById('menuLogout').addEventListener('click', () => {
-    auth.signOut().then(() => {
-        window.location.href = 'index.html';
-    });
-});
+        // Inicializa API do YouTube
+        function onYouTubeIframeAPIReady() {
+            // Players serão criados quando necessário
+        }
     </script>
 </body>
 </html>
