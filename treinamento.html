@@ -168,6 +168,9 @@
             <li id="menuProfile">
                 <i class="material-icons">person</i> Perfil
             </li>
+            <li class="active" id="menuISTs">
+                <i class="material-icons">description</i> ISTs
+           </li>
             <li id="menuCompleted">
                 <i class="material-icons">check_circle</i> Concluídos
             </li>
@@ -967,6 +970,9 @@ function sendUserMessage() {
         document.getElementById('menuCompleted').addEventListener('click', () => {
             window.location.href = 'concluidos.html';
         });
+        document.getElementById('menuISTs').addEventListener('click', () => {
+            window.location.href = 'home_ist.html';
+        });
 
         document.getElementById('menuLogout').addEventListener('click', () => {
             auth.signOut().then(() => {
@@ -978,6 +984,8 @@ function sendUserMessage() {
         function onYouTubeIframeAPIReady() {
             // Players serão criados quando necessário
         }
+
+        
     </script>
 </body>
 </html>

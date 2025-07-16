@@ -14,7 +14,7 @@ body {
 /* Menu Lateral */
 .sidebar {
     width: 250px;
-    background-color: #254c00;
+    background-color: #3b4c8b;
     color: white;
     height: 100vh;
     position: fixed;
@@ -23,7 +23,7 @@ body {
 
 .sidebar-header {
     padding: 0 20px 20px;
-    border-bottom: 1px solid #8fb76d;
+    border-bottom: 1px solid #6674ac;
     margin-bottom: 20px;
 }
 
@@ -38,11 +38,11 @@ body {
 }
 
 .sidebar-menu li:hover {
-    background-color: #8fb76d;
+    background-color: #6674ac;
 }
 
 .sidebar-menu li.active {
-    background-color: #416620;
+    background-color: #1b2a8165;
 }
 
 .sidebar-menu li i {

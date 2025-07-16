@@ -14,7 +14,7 @@
     
     <style>
         .btn-certificate {
-            background-color: #4CAF50;
+            background-color: #3b4c8b;
             color: white;
             border: none;
             padding: 8px 15px;
@@ -28,7 +28,7 @@
         }
         
         .btn-certificate:hover {
-            background-color: #45a049;
+            background-color: rgb(89, 69, 160);
         }
         
         .training-actions {
@@ -114,7 +114,10 @@
             <li id="menuProfile">
                 <i class="material-icons">person</i> Perfil
             </li>
-            <li class="active" id="menuCompleted">
+            <li class="active" id="menuISTs">
+                <i class="material-icons">description</i> ISTs
+           </li>
+            <li id="menuCompleted">
                 <i class="material-icons">check_circle</i> Concluídos
             </li>
             <li id="menuLogout">
@@ -172,7 +175,6 @@
             <div class="certificate-options">
                 <button id="clearSignature">Limpar Assinatura</button>
                 <button id="saveSignature">Assinar e Baixar</button>
-                <button id="digitalSignature">Assinar Digitalmente (ICP-Brasil)</button>
             </div>
             
             <div id="certificateUpload" style="display: none; margin-top: 20px;">
@@ -727,6 +729,10 @@
         
         document.getElementById('menuProfile').addEventListener('click', () => {
             window.location.href = 'perfil.html';
+        });
+
+        document.getElementById('menuISTs').addEventListener('click', () => {
+            window.location.href = 'home_ist.html';
         });
         
         document.getElementById('menuCompleted').addEventListener('click', () => {
