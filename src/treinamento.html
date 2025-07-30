@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treinamento - GZL Treinamentos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/primeiros-socorros.css">
+</head>
+<body>
+    <!-- Menu Lateral -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GZL Treinamentos</h2>
+            <p>Bem-vindo, <span id="userName"></span></p>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active" id="menuHome">
+                <i class="material-icons">home</i> Home
+            </li>
+            <li id="menuProfile">
+                <i class="material-icons">person</i> Perfil
+            </li>
+            <li id="menuISTs">
+                <i class="material-icons">description</i> ISTs
+           </li>
+            <li id="menuCompleted">
+                <i class="material-icons">check_circle</i> Concluídos
+            </li>
+            <li id="menuLogout">
+                <i class="material-icons">logout</i> Sair
+            </li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title" id="trainingTitle">Carregando treinamento...</h1>
+        </div>
+        
+        <div class="training-content">
+            <div id="videosContainer"></div>
+            <div id="quizContainer" class="quiz-container" style="display:none;"></div>
+            <div class="training-completed" id="trainingCompleted" style="display:none;">
+                <h2><i class="material-icons">check_circle</i> Treinamento Concluído com Sucesso!</h2>
+                <p>Você completou todas as aulas e a prova final. Parabéns!</p>
+                <p id="validityMessage"></p>
+                <p>Seu certificado estará disponível em seu perfil.</p>
+                <button id="watchAgainBtn" class="watch-again-btn">
+                    <i class="material-icons">replay</i> Assistir Novamente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat IA -->
+    <div class="chat-icon" id="chatIcon">
+        <i class="material-icons">chat</i>
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <span>Laura Assistente virtual </span>
+            <span class="close-chat" id="closeChat">&times;</span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <span>Estou aqui para ajudar você com informações sobre nossos cursos, horários, inscrições, certificados e muito mais.
+                    Se precisar de apoio ou tiver dúvidas, é só me chamar! Juntos, vamos tornar sua experiência de aprendizado mais prática e eficiente
+                </span>
+            </div>
+        </div>
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Digite sua dúvida..." autocomplete="off">
+            <button id="sendMessage"><i class="material-icons">send</i></button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G"
+        };
+
+        // Inicialização do Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Variáveis globais
+        let currentUser = null;
+        let currentTrainingId = null;
+        let currentTrainingData = {};
+        let userTrainingProgress = {};
+        let videoPlayers = [];
+        let currentVideoIndex = 0;
+
+        // Configuração do Chat IA
+        const chatIcon = document.getElementById('chatIcon');
+        const chatContainer = document.getElementById('chatContainer');
+        const closeChat = document.getElementById('closeChat');
+        const sendMessage = document.getElementById('sendMessage');
+        const userInput = document.getElementById('userInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Alternar visibilidade do chat
+        chatIcon.addEventListener('click', toggleChat);
+        closeChat.addEventListener('click', toggleChat);
+
+        function toggleChat() {
+            chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
+            if (chatContainer.style.display === 'flex') {
+                userInput.focus();
+            }
+        }
+
+        // Adicionar mensagem ao chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Mostrar indicador de digitação
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Esconder indicador de digitação
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        // Função principal que envia mensagens para a IA e exibe a resposta
+        async function sendToAI(message) {
+            showTypingIndicator(); 
+            
+            try {
+                const respostaIA = await queryGroqFree(message);
+                addMessage(respostaIA, 'bot');
+            } catch (error) {
+                console.error("Erro ao chamar a IA:", error);
+                addMessage("⚠️ Erro ao acessar a IA. Tente novamente.", 'bot');
+            } finally {
+                hideTypingIndicator();
+            }
+        }
+
+        // Função para buscar a API Key do Firebase
+        async function getApiKeyFromFirebase() {
+            try {
+                const snapshot = await database.ref('apiKeys/groq').once('value');
+                const apiData = snapshot.val();
+                
+                if (apiData && apiData.key) {
+                    return apiData.key;
+                } else {
+                    throw new Error('API Key não encontrada no banco de dados');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar API Key:', error);
+                throw error;
+            }
+        }
+
+        // Enviar mensagem para a IA
+        async function queryGroqFree(message) {
+            try {
+                const apiKey = await getApiKeyFromFirebase();
+                
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        model: "llama3-70b-8192",
+                        messages: [
+                            {
+                                role: "system",
+                                content: `Você é Laura assistente virtual da GZL Treinamentos. Sua função é:
+                                         - Tirar dúvidas sobre o funcionamento dos treinamentos (certificados, prazos, acesso, etc.)
+                                         - Orientar sobre como navegar na plataforma
+                                         - Fornecer informações sobre suporte técnico
+                                         - e outra duvidas e conteudos fora do sistema, voce pode ter sua propria personalidade e seu nome sera Laura a assistente virtual da GZL Treinamentos`
+                            },
+                            { 
+                                role: "user", 
+                                content: message 
+                            }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 300
+                    }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro na API: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data.choices[0]?.message?.content;
+                
+            } catch (error) {
+                console.error('Erro ao consultar a IA:', error);
+                return "Desculpe, estou tendo problemas para me conectar ao serviço. Por favor, tente novamente mais tarde.";
+            }
+        }
+
+        // Enviar mensagem do usuário
+        function sendUserMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            showTypingIndicator();
+            
+            queryGroqFree(message)
+                .then(response => {
+                    addMessage(response, 'bot');
+                })
+                .catch(error => {
+                    console.error("Erro:", error);
+                    addMessage("Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.", 'bot');
+                })
+                .finally(() => {
+                    hideTypingIndicator();
+                });
+        }
+
+        // Event listeners para o chat
+        sendMessage.addEventListener('click', sendUserMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendUserMessage();
+            }
+        });
+
+        // Quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentTrainingId = urlParams.get('id');
+            
+            if (!currentTrainingId) {
+                alert('Treinamento não especificado!');
+                window.location.href = 'home.html';
+                return;
+            }
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+                    loadTrainingData();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+
+        // Carrega os dados do treinamento
+        function loadTrainingData() {
+            database.ref(`trainings/${currentTrainingId}`).once('value').then((trainingSnapshot) => {
+                currentTrainingData = trainingSnapshot.val();
+                
+                if (!currentTrainingData) {
+                    alert('Treinamento não encontrado!');
+                    window.location.href = 'home.html';
+                    return;
+                }
+                
+                document.getElementById('trainingTitle').textContent = currentTrainingData.name;
+                
+                return database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).once('value');
+            }).then((progressSnapshot) => {
+                userTrainingProgress = progressSnapshot.val() || {};
+                
+                console.log('Progresso carregado:', userTrainingProgress);
+                
+                initializeTrainingPage();
+            }).catch((error) => {
+                console.error("Erro ao carregar dados:", error);
+                alert('Erro ao carregar treinamento!');
+            });
+        }
+
+        // Inicializa a página do treinamento
+        function initializeTrainingPage() {
+            const isTrainingCompleted = () => {
+                if (!userTrainingProgress) return false;
+                
+                const hasRequiredFields = 
+                    userTrainingProgress.quizCompleted === true &&
+                    userTrainingProgress.completedAt &&
+                    typeof userTrainingProgress.quizScore === 'number';
+                
+                let videosCompleted = true;
+                if (currentTrainingData.videos && currentTrainingData.videos.length > 0) {
+                    for (let i = 0; i < currentTrainingData.videos.length; i++) {
+                        const videoNumber = i + 1;
+                        if (!userTrainingProgress[`video${videoNumber}`] || 
+                            userTrainingProgress[`video${videoNumber}`].progress !== 100) {
+                            videosCompleted = false;
+                            break;
+                        }
+                    }
+                }
+                
+                return hasRequiredFields && videosCompleted;
+            };
+
+            if (isTrainingCompleted()) {
+                showTrainingCompletion();
+                return;
+            }
+
+            determineCurrentVideo();
+            renderVideos();
+            
+            if (shouldShowQuiz()) {
+                showQuiz();
+            }
+        }
+
+        // Determina qual vídeo deve ser mostrado
+        function determineCurrentVideo() {
+            if (!currentTrainingData.videos || currentTrainingData.videos.length === 0) {
+                currentVideoIndex = -1;
+                return;
+            }
+            
+            currentVideoIndex = 0;
+            for (let i = 0; i < currentTrainingData.videos.length; i++) {
+                const videoNumber = i + 1;
+                if (!userTrainingProgress[`video${videoNumber}`] || userTrainingProgress[`video${videoNumber}`].progress !== 100) {
+                    currentVideoIndex = i;
+                    break;
+                }
+            }
+        }
+
+        // Renderiza os vídeos do treinamento
+        function renderVideos() {
+            const videosContainer = document.getElementById('videosContainer');
+            videosContainer.innerHTML = '';
+            
+            if (!currentTrainingData.videos || currentTrainingData.videos.length === 0) {
+                videosContainer.innerHTML = '<p>Este treinamento não possui vídeos.</p>';
+                return;
+            }
+            
+            const sortedVideos = [...currentTrainingData.videos].sort((a, b) => (a.order || 0) - (b.order || 0));
+            
+            sortedVideos.forEach((video, index) => {
+                const videoNumber = index + 1;
+                const isCompleted = userTrainingProgress[`video${videoNumber}`]?.progress === 100;
+                const isAvailable = videoNumber === 1 || 
+                                   userTrainingProgress[`video${videoNumber-1}`]?.progress === 100 ||
+                                   userTrainingProgress[`video${videoNumber}`]?.available;
+                
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+                videoContainer.id = `video${videoNumber}-container`;
+                
+                let videoStatusIcon = 'lock';
+                let statusClass = 'locked';
+                
+                if (isAvailable) {
+                    videoStatusIcon = isCompleted ? 'check_circle' : 'play_circle_outline';
+                    statusClass = isCompleted ? 'completed' : 'pending';
+                }
+                
+                videoContainer.innerHTML = `
+                    <div class="video-status">
+                        <i class="material-icons ${statusClass}">${videoStatusIcon}</i>
+                        <span>Aula ${videoNumber}: ${video.title}</span>
+                    </div>
+                    <div class="video-wrapper">
+                        <div id="video${videoNumber}"></div>
+                        ${!isAvailable ? `
+                        <div class="video-locked-message" id="locked-message${videoNumber}">
+                            Complete a Aula ${videoNumber-1} para desbloquear este conteúdo
+                        </div>
+                        ` : ''}
+                        <div class="video-loading" id="videoLoading${videoNumber}" style="display:none;">
+                            Carregando próxima aula...
+                        </div>
+                    </div>
+                `;
+                
+                videosContainer.appendChild(videoContainer);
+                
+                if (isAvailable) {
+                    setupVideoPlayer(videoNumber, video.url);
+                }
+            });
+        }
+
+        // Extrai ID do vídeo do YouTube
+        function extractVideoId(url) {
+            if (!url) return '';
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : '';
+        }
+
+        // Configura o player de vídeo
+        function setupVideoPlayer(videoNumber, videoUrl) {
+            const videoId = extractVideoId(videoUrl);
+            
+            videoPlayers[videoNumber] = new YT.Player(`video${videoNumber}`, {
+                height: '360',
+                width: '640',
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 1, // Mostra apenas os controles básicos
+                    'modestbranding': 1,
+                    'rel': 0, // Remove vídeos relacionados no final
+                    'showinfo': 0, // Remove informações do vídeo
+                    'fs': 0, // Remove botão de tela cheia
+                    'disablekb': 1, // Desabilita controles do teclado
+                    'iv_load_policy': 3, // Remove anotações
+                    'enablejsapi': 1
+                },
+                events: {
+                    'onReady': (event) => onPlayerReady(event, videoNumber),
+                    'onStateChange': (event) => onPlayerStateChange(event, videoNumber)
+                }
+            });
+        }
+
+        // Quando o player está pronto
+        function onPlayerReady(event, videoNumber) {
+            if (videoNumber === currentVideoIndex + 1 && 
+                (!userTrainingProgress[`video${videoNumber}`] || userTrainingProgress[`video${videoNumber}`].progress !== 100)) {
+                event.target.playVideo();
+            }
+            
+            // Remove controles indesejados após o player carregar
+            setTimeout(() => {
+                const iframe = document.querySelector(`#video${videoNumber} iframe`);
+                if (iframe) {
+                    iframe.style.pointerEvents = 'none'; // Impede interação com o vídeo
+                }
+            }, 1000);
+        }
+
+        // Monitora estados do vídeo
+        function onPlayerStateChange(event, videoNumber) {
+            if (event.data === YT.PlayerState.ENDED) {
+                if (!userTrainingProgress[`video${videoNumber}`]?.progress) {
+                    markVideoAsCompleted(videoNumber).then(() => {
+                        handleVideoCompletion(videoNumber);
+                    });
+                } else {
+                    handleVideoCompletion(videoNumber);
+                }
+            }
+        }
+
+        // Manipula a conclusão do vídeo
+        function handleVideoCompletion(videoNumber) {
+            if (videoNumber >= currentTrainingData.videos.length) {
+                if (shouldShowQuiz()) {
+                    showQuiz();
+                }
+                return;
+            }
+            
+            const nextVideoNumber = videoNumber + 1;
+            
+            const lockedMessage = document.getElementById(`locked-message${nextVideoNumber}`);
+            const nextVideoFrame = document.getElementById(`video${nextVideoNumber}`);
+            
+            if (lockedMessage) lockedMessage.style.display = 'none';
+            if (nextVideoFrame) nextVideoFrame.classList.remove('video-locked');
+            
+            document.getElementById(`videoLoading${videoNumber}`).style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById(`video${nextVideoNumber}-container`).scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                
+                setTimeout(() => {
+                    document.getElementById(`videoLoading${videoNumber}`).style.display = 'none';
+                    
+                    if (videoPlayers[nextVideoNumber]) {
+                        videoPlayers[nextVideoNumber].playVideo();
+                    } else {
+                        setupVideoPlayer(nextVideoNumber, currentTrainingData.videos[nextVideoNumber-1].url);
+                    }
+                }, 500);
+            }, 800);
+        }
+
+        // Marca vídeo como completado
+        function markVideoAsCompleted(videoNumber) {
+            return new Promise((resolve, reject) => {
+                if (userTrainingProgress[`video${videoNumber}`]?.progress === 100) {
+                    resolve();
+                    return;
+                }
+                
+                const updates = {
+                    [`video${videoNumber}/completedAt`]: new Date().toISOString(),
+                    [`video${videoNumber}/progress`]: 100,
+                    [`video${videoNumber}/userEmail`]: currentUser.email
+                };
+                
+                if (videoNumber === 1 && !userTrainingProgress.startedAt) {
+                    updates.startedAt = new Date().toISOString();
+                    updates.status = 'in_progress';
+                }
+                
+                if (videoNumber < currentTrainingData.videos.length) {
+                    updates[`video${videoNumber+1}/available`] = true;
+                }
+                
+                database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(updates)
+                    .then(() => {
+                        if (!userTrainingProgress[`video${videoNumber}`]) {
+                            userTrainingProgress[`video${videoNumber}`] = {};
+                        }
+                        userTrainingProgress[`video${videoNumber}`].progress = 100;
+                        userTrainingProgress[`video${videoNumber}`].completedAt = updates[`video${videoNumber}/completedAt`];
+                        
+                        if (videoNumber === 1) {
+                            userTrainingProgress.startedAt = updates.startedAt;
+                            userTrainingProgress.status = 'in_progress';
+                        }
+                        
+                        if (videoNumber < currentTrainingData.videos.length) {
+                            if (!userTrainingProgress[`video${videoNumber+1}`]) {
+                                userTrainingProgress[`video${videoNumber+1}`] = {};
+                            }
+                            userTrainingProgress[`video${videoNumber+1}`].available = true;
+                        }
+                        
+                        updateVideoStatus(videoNumber);
+                        resolve();
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao atualizar progresso:", error);
+                        reject(error);
+                    });
+            });
+        }
+
+        // Atualiza status do vídeo
+        function updateVideoStatus(videoNumber) {
+            const statusIcon = document.querySelector(`#video${videoNumber}-container .material-icons`);
+            if (statusIcon) {
+                statusIcon.textContent = 'check_circle';
+                statusIcon.classList.remove('pending', 'locked');
+                statusIcon.classList.add('completed');
+            }
+        }
+
+        // Verifica se deve mostrar o questionário
+        function shouldShowQuiz() {
+            if (!currentTrainingData.videos || currentTrainingData.videos.length === 0) {
+                return true;
+            }
+            
+            return currentTrainingData.videos.every((_, index) => {
+                const videoNumber = index + 1;
+                return userTrainingProgress[`video${videoNumber}`]?.progress === 100;
+            });
+        }
+
+        // Renderiza o questionário
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.innerHTML = '';
+            
+            if (!currentTrainingData.questions || currentTrainingData.questions.length === 0) {
+                quizContainer.innerHTML = '<p>Este treinamento não possui questionário.</p>';
+                return;
+            }
+            
+            const quizDiv = document.createElement('div');
+            quizDiv.className = 'quiz-container';
+            quizDiv.id = 'quizContainerContent';
+            
+            quizDiv.innerHTML = `
+                <h2>Prova Final - ${currentTrainingData.name}</h2>
+                <p>Responda as questões abaixo para finalizar o treinamento:</p>
+                <form id="quizForm"></form>
+            `;
+            
+            const quizForm = quizDiv.querySelector('#quizForm');
+            
+            currentTrainingData.questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-question';
+                
+                let optionsHtml = '';
+                question.options.forEach((option, i) => {
+                    if (option) {
+                        const optionLetter = String.fromCharCode(97 + i);
+                        optionsHtml += `
+                            <div class="quiz-option">
+                                <input type="radio" name="q${index}" value="${optionLetter}" id="q${index}_opt${i}" required>
+                                <label for="q${index}_opt${i}">${optionLetter.toUpperCase()}) ${option}</label>
+                            </div>
+                        `;
+                    }
+                });
+                
+                questionDiv.innerHTML = `
+                    <h4>${index + 1}. ${question.text}</h4>
+                    <div class="quiz-options">
+                        ${optionsHtml}
+                    </div>
+                `;
+                
+                quizForm.appendChild(questionDiv);
+            });
+            
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit';
+            submitButton.className = 'submit-quiz';
+            submitButton.innerHTML = '<i class="material-icons">send</i> Enviar Prova';
+            quizForm.appendChild(submitButton);
+            
+            quizContainer.appendChild(quizDiv);
+            quizForm.addEventListener('submit', (e) => submitQuiz(e));
+        }
+
+        // Mostra o questionário
+        function showQuiz() {
+            renderQuiz();
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('quizContainerContent').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('quizContainer').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 300);
+        }
+
+        // Envia o questionário
+        function submitQuiz(e) {
+            e.preventDefault();
+            
+            if (userTrainingProgress.quizCompleted) {
+                showTrainingCompletion();
+                return;
+            }
+            
+            const score = calculateQuizScore();
+            
+            if (score < 80) {
+                alert(`Você acertou ${score}% das questões. É necessário acertar no mínimo 80% para concluir o treinamento. Você precisará refazer o treinamento.`);
+                
+                const resetUpdates = {};
+                
+                if (currentTrainingData.videos && currentTrainingData.videos.length > 0) {
+                    resetUpdates['video1/progress'] = 0;
+                    resetUpdates['video1/completedAt'] = null;
+                    resetUpdates['video1/available'] = true;
+                    
+                    for (let i = 2; i <= currentTrainingData.videos.length; i++) {
+                        resetUpdates[`video${i}/progress`] = 0;
+                        resetUpdates[`video${i}/completedAt`] = null;
+                        resetUpdates[`video${i}/available`] = false;
+                    }
+                }
+                
+                resetUpdates.quizCompleted = false;
+                resetUpdates.quizScore = null;
+                resetUpdates.quizAnswers = null;
+                resetUpdates.status = 'in_progress';
+                
+                database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(resetUpdates)
+                    .then(() => {
+                        window.location.reload();
+                    });
+                return;
+            }
+            
+            const updates = {
+                quizCompleted: true,
+                quizScore: score,
+                quizAnswers: getQuizAnswers(),
+                completedAt: new Date().toISOString(),
+                status: 'completed'
+            };
+            
+            database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(updates)
+                .then(() => {
+                    Object.assign(userTrainingProgress, updates);
+                    showTrainingCompletion();
+                });
+        }
+
+        // Calcula a pontuação
+        function calculateQuizScore() {
+            let correctAnswers = 0;
+            
+            currentTrainingData.questions.forEach((question, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selectedOption && selectedOption.value === question.correctAnswer.toLowerCase()) {
+                    correctAnswers++;
+                }
+            });
+            
+            return Math.round((correctAnswers / currentTrainingData.questions.length) * 100);
+        }
+
+        // Obtém as respostas
+        function getQuizAnswers() {
+            const answers = {};
+            
+            currentTrainingData.questions.forEach((_, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selectedOption) {
+                    answers[`q${index}`] = selectedOption.value;
+                }
+            });
+            
+            return answers;
+        }
+
+        // Mostra conclusão
+        function showTrainingCompletion() {
+            document.getElementById('videosContainer').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'none';
+            
+            const completedAt = new Date(userTrainingProgress.completedAt);
+            const validUntil = new Date(completedAt);
+            validUntil.setFullYear(validUntil.getFullYear() + (currentTrainingData.validity || 1));
+            
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            const completedAtStr = completedAt.toLocaleDateString('pt-BR', options);
+            const validUntilStr = validUntil.toLocaleDateString('pt-BR', options);
+            
+            document.getElementById('validityMessage').textContent = 
+                `Treinamento concluído em ${completedAtStr}. Válido até ${validUntilStr}. ` +
+                `Pontuação: ${userTrainingProgress.quizScore}%`;
+            
+            document.getElementById('trainingCompleted').style.display = 'block';
+            document.getElementById('trainingCompleted').scrollIntoView({ behavior: 'smooth' });
+            
+            // Configura o botão "Assistir Novamente"
+            document.getElementById('watchAgainBtn').addEventListener('click', () => {
+                const resetUpdates = {
+                    quizCompleted: false,
+                    quizScore: null,
+                    quizAnswers: null,
+                    completedAt: null,
+                    status: 'in_progress'
+                };
+                
+                if (currentTrainingData.videos && currentTrainingData.videos.length > 0) {
+                    for (let i = 1; i <= currentTrainingData.videos.length; i++) {
+                        resetUpdates[`video${i}/progress`] = 0;
+                        resetUpdates[`video${i}/completedAt`] = null;
+                        if (i > 1) {
+                            resetUpdates[`video${i}/available`] = false;
+                        } else {
+                            resetUpdates[`video${i}/available`] = true;
+                        }
+                    }
+                }
+                
+                database.ref(`userTrainings/${currentUser.uid}/${currentTrainingId}`).update(resetUpdates)
+                    .then(() => {
+                        window.location.reload();
+                    });
+            });
+        }
+
+        // Navegação
+        document.getElementById('menuHome').addEventListener('click', () => {
+            window.location.href = 'home.html';
+        });
+
+        document.getElementById('menuProfile').addEventListener('click', () => {
+            window.location.href = 'perfil.html';
+        });
+
+        document.getElementById('menuCompleted').addEventListener('click', () => {
+            window.location.href = 'concluidos.html';
+        });
+        document.getElementById('menuISTs').addEventListener('click', () => {
+            window.location.href = 'home_ist.html';
+        });
+
+        document.getElementById('menuLogout').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        });
+
+        // Inicializa API do YouTube
+        function onYouTubeIframeAPIReady() {
+            // Players serão criados quando necessário
+        }
+    </script>
+</body>
+</html>

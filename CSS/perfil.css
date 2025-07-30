@@ -629,6 +629,13 @@ body {
 button:not(:disabled):hover {
     opacity: 0.9;
 }
+.sidebar-menu li.active {
+             background-color: #e0e0e0; /* Cor de fundo para o item ativo */
+             color: #333;
+         }
+         .sidebar-menu li.active i {
+              color: #333;
+         }
 
 /* Efeito de foco para acessibilidade */
 button:focus {

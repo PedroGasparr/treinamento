@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (user) {
             // Verifica se é o email de admin especial
             if (user.email === "mortadela22112005@gmail.com") {
-                window.location.href = "admin.html";
+                window.location.href = "src/admin.html";
             } else {
                 // Redireciona usuários normais para outra página
-                window.location.href = "home.html";
+                window.location.href = "src/home.html";
             }
         }
     });

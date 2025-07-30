@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Funções por Unidade - GZL Treinamentos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/admin.css">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .form-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #3367D6;
+        }
+        
+        .functions-list {
+            margin-top: 30px;
+        }
+        
+        .function-item {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .function-info {
+            flex: 1;
+        }
+        
+        .function-actions {
+            margin-left: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+        }
+        
+        .edit-btn {
+            background-color: #FF9800;
+        }
+        
+        .filters-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .filters-container {
+                flex-direction: column;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Lateral -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GZL Treinamentos</h2>
+            <p>Bem-vindo, <span id="userName"></span></p>
+        </div>
+        <ul class="sidebar-menu">
+            <li id="menuHome">
+                <i class="material-icons">home</i> Home
+            </li>
+            <li id="menuEmployees">
+                <i class="material-icons">people</i> Funcionários
+            </li>
+            <li class="active" id="menuTrainings">
+                <i class="material-icons">school</i> Treinamentos
+            </li>
+            <li id="menuProfile">
+                <i class="material-icons">person</i> Perfil
+            </li>
+            <li id="menuLogout">
+                <i class="material-icons">logout</i> Sair
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="form-container">
+            <h1><i class="material-icons">add_circle_outline</i> Criar Função por Unidade</h1>
+            
+            <div class="form-group">
+                <label for="unidade">Unidade:</label>
+                <select id="unidade" required>
+                    <option value="">Selecione uma unidade</option>
+                    <option value="ADM-MTZ-MCZ">ADM-MTZ-MCZ</option>
+                    <option value="CD-SZL-SZN">CD-SZL-SZN</option>
+                    <option value="CD-SZN-CAS">CD-SZN-CAS</option>
+                    <option value="CD-SZN-CCA">CD-SZN-CCA</option>
+                    <option value="CD-SZN-MCW">CD-SZN-MCW</option>
+                    <option value="CD-SZN-SEA">CD-SZN-SEA</option>
+                    <option value="CD-SZN-SJP">CD-SZN-SJP</option>
+                    <option value="CD-SZN-SZN">CD-SZN-SZN</option>
+                    <option value="CD-TRI-GRU">CD-TRI-GRU</option>
+                    <option value="CD-TZK-SZN">CD-TZK-SZN</option>
+                    <option value="CD-YHM-SP">CD-YHM-SP</option>
+                    <option value="CLIENTE MUNKSJO">CLIENTE MUNKSJO</option>
+                    <option value="F-AST-JCI">F-AST-JCI</option>
+                    <option value="F-BTK-SRQ">F-BTK-SRQ</option>
+                    <option value="F-IBM-EMB">F-IBM-EMB</option>
+                    <option value="F-IMS-CIM">F-IMS-CIM</option>
+                    <option value="F-IMS-LRA">F-IMS-LRA</option>
+                    <option value="F-IMS-MCZ">F-IMS-MCZ</option>
+                    <option value="F-JD-CAS">F-JD-CAS</option>
+                    <option value="F-JD-CTL">F-JD-CTL</option>
+                    <option value="F-JD-HZA">F-JD-HZA</option>
+                    <option value="F-JD-MGO">F-JD-MGO</option>
+                    <option value="F-JDBZ-IDU">F-JDBZ-IDU</option>
+                    <option value="F-JDHB-IDU">F-JDHB-IDU</option>
+                    <option value="F-NTR-MCZ">F-NTR-MCZ</option>
+                    <option value="F-OJI-PAA">F-OJI-PAA</option>
+                    <option value="F-OJI-RCA">F-OJI-RCA</option>
+                    <option value="F-PCO-FSA">F-PCO-FSA</option>
+                    <option value="F-PCO-MCZ">F-PCO-MCZ</option>
+                    <option value="F-SRV-SZN">F-SRV-SZN</option>
+                    <option value="F-SZN-ACZ">F-SZN-ACZ</option>
+                    <option value="F-SZN-BLM">F-SZN-BLM</option>
+                    <option value="F-SZN-CPO">F-SZN-CPO</option>
+                    <option value="F-SZN-IMP">F-SZN-IMP</option>
+                    <option value="F-SZN-JCI">F-SZN-JCI</option>
+                    <option value="F-SZN-LRA">F-SZN-LRA</option>
+                    <option value="F-SZN-MCW">F-SZN-MCW</option>
+                    <option value="F-SZN-SZN">F-SZN-SZN</option>
+                    <option value="F-WBR-CAR">F-WBR-CAR</option>
+                    <option value="F-WBR-JAD">F-WBR-JAD</option>
+                    <option value="F-WBR-MCZ">F-WBR-MCZ</option>
+                    <option value="F-WTM-JCI">F-WTM-JCI</option>
+                    <option value="ITM-SP">ITM-SP</option>
+                    <option value="JSL - ARAUCARIA">JSL - ARAUCARIA</option>
+                    <option value="JSL - CAPUAVA">JSL - CAPUAVA</option>
+                    <option value="JSL - VOLTA REDONDA">JSL - VOLTA REDONDA</option>
+                    <option value="LIMEIRA - CLIENTE">LIMEIRA - CLIENTE</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="funcao">Função:</label>
+                <input type="text" id="funcao" placeholder="Digite o nome da função" required>
+            </div>
+            
+            <button id="btnSalvarFuncao">
+                <i class="material-icons">save</i> Salvar Função
+            </button>
+            
+            <div class="functions-list">
+                <h2>Funções Cadastradas</h2>
+                
+                <!-- Filtros -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label for="filterFuncao">Filtrar por Função:</label>
+                        <input type="text" id="filterFuncao" placeholder="Digite o nome da função">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterUnidade">Filtrar por Unidade:</label>
+                        <select id="filterUnidade">
+                            <option value="">Todas as unidades</option>
+                            <option value="ADM-MTZ-MCZ">ADM-MTZ-MCZ</option>
+                            <option value="CD-SZL-SZN">CD-SZL-SZN</option>
+                            <option value="CD-SZN-CAS">CD-SZN-CAS</option>
+                            <option value="CD-SZN-CCA">CD-SZN-CCA</option>
+                            <option value="CD-SZN-MCW">CD-SZN-MCW</option>
+                            <option value="CD-SZN-SEA">CD-SZN-SEA</option>
+                            <option value="CD-SZN-SJP">CD-SZN-SJP</option>
+                            <option value="CD-SZN-SZN">CD-SZN-SZN</option>
+                            <option value="CD-TRI-GRU">CD-TRI-GRU</option>
+                            <option value="CD-TZK-SZN">CD-TZK-SZN</option>
+                            <option value="CD-YHM-SP">CD-YHM-SP</option>
+                            <option value="CLIENTE MUNKSJO">CLIENTE MUNKSJO</option>
+                            <option value="F-AST-JCI">F-AST-JCI</option>
+                            <option value="F-BTK-SRQ">F-BTK-SRQ</option>
+                            <option value="F-IBM-EMB">F-IBM-EMB</option>
+                            <option value="F-IMS-CIM">F-IMS-CIM</option>
+                            <option value="F-IMS-LRA">F-IMS-LRA</option>
+                            <option value="F-IMS-MCZ">F-IMS-MCZ</option>
+                            <option value="F-JD-CAS">F-JD-CAS</option>
+                            <option value="F-JD-CTL">F-JD-CTL</option>
+                            <option value="F-JD-HZA">F-JD-HZA</option>
+                            <option value="F-JD-MGO">F-JD-MGO</option>
+                            <option value="F-JDBZ-IDU">F-JDBZ-IDU</option>
+                            <option value="F-JDHB-IDU">F-JDHB-IDU</option>
+                            <option value="F-NTR-MCZ">F-NTR-MCZ</option>
+                            <option value="F-OJI-PAA">F-OJI-PAA</option>
+                            <option value="F-OJI-RCA">F-OJI-RCA</option>
+                            <option value="F-PCO-FSA">F-PCO-FSA</option>
+                            <option value="F-PCO-MCZ">F-PCO-MCZ</option>
+                            <option value="F-SRV-SZN">F-SRV-SZN</option>
+                            <option value="F-SZN-ACZ">F-SZN-ACZ</option>
+                            <option value="F-SZN-BLM">F-SZN-BLM</option>
+                            <option value="F-SZN-CPO">F-SZN-CPO</option>
+                            <option value="F-SZN-IMP">F-SZN-IMP</option>
+                            <option value="F-SZN-JCI">F-SZN-JCI</option>
+                            <option value="F-SZN-LRA">F-SZN-LRA</option>
+                            <option value="F-SZN-MCW">F-SZN-MCW</option>
+                            <option value="F-SZN-SZN">F-SZN-SZN</option>
+                            <option value="F-WBR-CAR">F-WBR-CAR</option>
+                            <option value="F-WBR-JAD">F-WBR-JAD</option>
+                            <option value="F-WBR-MCZ">F-WBR-MCZ</option>
+                            <option value="F-WTM-JCI">F-WTM-JCI</option>
+                            <option value="ITM-SP">ITM-SP</option>
+                            <option value="JSL - ARAUCARIA">JSL - ARAUCARIA</option>
+                            <option value="JSL - CAPUAVA">JSL - CAPUAVA</option>
+                            <option value="JSL - VOLTA REDONDA">JSL - VOLTA REDONDA</option>
+                            <option value="LIMEIRA - CLIENTE">LIMEIRA - CLIENTE</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="listaFuncoes">
+                    <!-- As funções serão carregadas aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // Inicialize o Firebase (substitua pela sua configuração)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+
+        // Variável para armazenar todas as funções
+        let todasFuncoes = [];
+
+        // Função para salvar nova função no Realtime Database
+        document.getElementById('btnSalvarFuncao').addEventListener('click', () => {
+            const unidade = document.getElementById('unidade').value;
+            const nomeFuncao = document.getElementById('funcao').value.trim();
+
+            if (!unidade || !nomeFuncao) {
+                alert('Por favor, selecione uma unidade e digite o nome da função');
+                return;
+            }
+
+            // Gerar ID único baseado no timestamp
+            const idFuncao = 'func_' + Date.now();
+
+            // Salvar no Realtime Database
+            db.ref('funcoes_por_unidade/' + idFuncao).set({
+                id: idFuncao,
+                name: nomeFuncao,
+                unidade: unidade,
+                createdAt: new Date().toISOString()
+            })
+            .then(() => {
+                alert('Função cadastrada com sucesso!');
+                document.getElementById('funcao').value = '';
+                carregarFuncoes();
+            })
+            .catch(error => {
+                console.error('Erro ao cadastrar função:', error);
+                alert('Erro ao cadastrar função. Tente novamente.');
+            });
+        });
+
+        // Função para carregar todas as funções do Realtime Database
+        function carregarFuncoes() {
+            const listaFuncoes = document.getElementById('listaFuncoes');
+            listaFuncoes.innerHTML = '<p>Carregando funções...</p>';
+
+            db.ref('funcoes_por_unidade').once('value')
+                .then(snapshot => {
+                    const data = snapshot.val();
+                    todasFuncoes = data ? Object.values(data) : [];
+                    aplicarFiltros();
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar funções:', error);
+                    listaFuncoes.innerHTML = '<p>Erro ao carregar funções. Tente recarregar a página.</p>';
+                });
+        }
+
+        // Função para aplicar filtros
+        function aplicarFiltros() {
+            const listaFuncoes = document.getElementById('listaFuncoes');
+            const filtroFuncao = document.getElementById('filterFuncao').value.toLowerCase();
+            const filtroUnidade = document.getElementById('filterUnidade').value;
+            
+            let funcoesFiltradas = todasFuncoes;
+            
+            // Aplicar filtro por nome da função
+            if (filtroFuncao) {
+                funcoesFiltradas = funcoesFiltradas.filter(funcao => 
+                    funcao.name.toLowerCase().includes(filtroFuncao)
+                );
+            }
+            
+            // Aplicar filtro por unidade
+            if (filtroUnidade) {
+                funcoesFiltradas = funcoesFiltradas.filter(funcao => 
+                    funcao.unidade === filtroUnidade
+                );
+            }
+            
+            // Exibir resultados
+            if (funcoesFiltradas.length === 0) {
+                listaFuncoes.innerHTML = '<p>Nenhuma função encontrada com os filtros aplicados.</p>';
+                return;
+            }
+            
+            listaFuncoes.innerHTML = '';
+            
+            funcoesFiltradas.forEach(funcao => {
+                const unidadeNome = funcao.unidade;
+
+                const functionItem = document.createElement('div');
+                functionItem.className = 'function-item';
+                functionItem.innerHTML = `
+                    <div class="function-info">
+                        <strong>${funcao.name}</strong>
+                        <div>Unidade: ${unidadeNome}</div>
+                    </div>
+                    <div class="function-actions">
+                        <button class="edit-btn" data-id="${funcao.id}">
+                            <i class="material-icons">edit</i>
+                        </button>
+                        <button class="delete-btn" data-id="${funcao.id}">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </div>
+                `;
+
+                listaFuncoes.appendChild(functionItem);
+            });
+
+            // Adicionar eventos aos botões de deletar
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    deletarFuncao(id);
+                });
+            });
+            
+            // Adicionar eventos aos botões de editar
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    editarFuncao(id);
+                });
+            });
+        }
+
+        // Função para editar uma função
+        function editarFuncao(id) {
+            const funcao = todasFuncoes.find(f => f.id === id);
+            if (!funcao) return;
+            
+            // Preencher o formulário com os dados da função
+            document.getElementById('unidade').value = funcao.unidade;
+            document.getElementById('funcao').value = funcao.name;
+            
+            // Alterar o botão de salvar para atualizar
+            const btnSalvar = document.getElementById('btnSalvarFuncao');
+            btnSalvar.innerHTML = '<i class="material-icons">save</i> Atualizar Função';
+            btnSalvar.onclick = function() {
+                atualizarFuncao(id);
+            };
+            
+            // Rolagem para o topo do formulário
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Função para atualizar uma função existente
+        function atualizarFuncao(id) {
+            const unidade = document.getElementById('unidade').value;
+            const nomeFuncao = document.getElementById('funcao').value.trim();
+
+            if (!unidade || !nomeFuncao) {
+                alert('Por favor, selecione uma unidade e digite o nome da função');
+                return;
+            }
+
+            // Atualizar no Realtime Database
+            db.ref('funcoes_por_unidade/' + id).update({
+                name: nomeFuncao,
+                unidade: unidade,
+                updatedAt: new Date().toISOString()
+            })
+            .then(() => {
+                alert('Função atualizada com sucesso!');
+                document.getElementById('funcao').value = '';
+                
+                // Restaurar o botão de salvar
+                const btnSalvar = document.getElementById('btnSalvarFuncao');
+                btnSalvar.innerHTML = '<i class="material-icons">save</i> Salvar Função';
+                btnSalvar.onclick = function() {
+                    const unidade = document.getElementById('unidade').value;
+                    const nomeFuncao = document.getElementById('funcao').value.trim();
+                    salvarNovaFuncao(unidade, nomeFuncao);
+                };
+                
+                carregarFuncoes();
+            })
+            .catch(error => {
+                console.error('Erro ao atualizar função:', error);
+                alert('Erro ao atualizar função. Tente novamente.');
+            });
+        }
+
+        // Função auxiliar para salvar nova função
+        function salvarNovaFuncao(unidade, nomeFuncao) {
+            // Gerar ID único baseado no timestamp
+            const idFuncao = 'func_' + Date.now();
+
+            // Salvar no Realtime Database
+            db.ref('funcoes_por_unidade/' + idFuncao).set({
+                id: idFuncao,
+                name: nomeFuncao,
+                unidade: unidade,
+                createdAt: new Date().toISOString()
+            })
+            .then(() => {
+                alert('Função cadastrada com sucesso!');
+                document.getElementById('funcao').value = '';
+                carregarFuncoes();
+            })
+            .catch(error => {
+                console.error('Erro ao cadastrar função:', error);
+                alert('Erro ao cadastrar função. Tente novamente.');
+            });
+        }
+
+        // Função para deletar uma função do Realtime Database
+        function deletarFuncao(id) {
+            if (confirm('Tem certeza que deseja excluir esta função?')) {
+                db.ref('funcoes_por_unidade/' + id).remove()
+                    .then(() => {
+                        alert('Função excluída com sucesso!');
+                        carregarFuncoes();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir função:', error);
+                        alert('Erro ao excluir função. Tente novamente.');
+                    });
+            }
+        }
+
+        // Carregar nome do usuário e funções ao fazer login
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('userName').textContent = user.displayName || user.email;
+                carregarFuncoes();
+                
+                // Adicionar eventos aos filtros
+                document.getElementById('filterFuncao').addEventListener('input', aplicarFiltros);
+                document.getElementById('filterUnidade').addEventListener('change', aplicarFiltros);
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+        // Navegação do menu - Atualizado com prevenção de comportamento padrão
+        document.getElementById('menuHome').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'home.html';
+        });
+        
+        document.getElementById('menuTrainings').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'trinametoadm.html';
+        });
+        
+        document.getElementById('menuEmployees').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'admin.html';
+        });
+        
+        document.getElementById('menuProfile').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'perfiladm.html';
+        });
+
+    </script>
+
+</body>
+</html>

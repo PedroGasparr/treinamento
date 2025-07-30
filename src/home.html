@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - GZL Treinamentos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/home.css">
+</head>
+<body>
+    <!-- Menu Lateral -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GZL Treinamentos</h2>
+            <p>Bem-vindo, <span id="userName"></span></p>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active"  id="menuHome">
+                <i class="material-icons">home</i> Home
+            </li>
+            <li id="menuProfile">
+                <i class="material-icons">person</i> Perfil
+            </li>
+            <li id="menuISTs">
+                <i class="material-icons">description</i> ISTs
+           </li>
+            <li id="menuCompleted">
+                <i class="material-icons">check_circle</i> Concluídos
+            </li>
+            <li id="menuLogout">
+                <i class="material-icons">logout</i> Sair
+            </li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Treinamentos Disponíveis</h1>
+        </div>
+        
+        <div class="training-container" id="trainingContainer">
+            <div class="loading-message">
+                <i class="material-icons spin">hourglass_top</i>
+                <p>Carregando treinamentos...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ícone de Admin -->
+    <div class="admin-icon" id="adminIcon" style="display: none;">
+        <i class="material-icons">admin_panel_settings</i>
+        <span class="admin-tooltip">Painel de Administração</span>
+    </div>
+    
+    <!-- Modal de Erro -->
+    <div class="modal" id="errorModal">
+        <div class="modal-content">
+            <i class="material-icons" style="color: #f44336; font-size: 48px;">error</i>
+            <h3>Acesso Negado</h3>
+            <p id="errorMessage">Você não tem permissão para acessar esta área.</p>
+            <button class="modal-close" id="modalClose">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G"
+        };
+
+        // Inicializa Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Dados do usuário
+        let currentUser = null;
+
+        // Verifica autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+                loadTrainings();
+                
+                // Verifica se é admin
+                checkAdminStatus(user.uid);
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Função para verificar se o usuário é admin
+        function checkAdminStatus(userId) {
+            database.ref('users/' + userId).once('value').then((snapshot) => {
+                const userData = snapshot.val();
+                if (userData && userData.isAdmin === true) {
+                    // Mostra o ícone de admin
+                    document.getElementById('adminIcon').style.display = 'flex';
+                }
+            }).catch((error) => {
+                console.error("Erro ao verificar status de admin:", error);
+            });
+        }
+
+        // Função para verificar permissões e redirecionar
+        function checkAdminAndRedirect() {
+            if (!currentUser) return;
+            
+            database.ref('users/' + currentUser.uid).once('value').then((snapshot) => {
+                const userData = snapshot.val();
+                if (userData && userData.isAdmin === true) {
+                    window.location.href = 'admin.html';
+                } else {
+                    showErrorModal('Você não tem permissão para acessar o painel de administração.');
+                }
+            }).catch((error) => {
+                console.error("Erro ao verificar permissões:", error);
+                showErrorModal('Ocorreu um erro ao verificar suas permissões.');
+            });
+        }
+
+        // Função para mostrar modal de erro
+        function showErrorModal(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorModal').style.display = 'flex';
+        }
+
+        // Evento de clique no ícone de admin
+        document.getElementById('adminIcon').addEventListener('click', checkAdminAndRedirect);
+        
+        // Evento de clique para fechar o modal
+        document.getElementById('modalClose').addEventListener('click', () => {
+            document.getElementById('errorModal').style.display = 'none';
+        });
+
+        // Carrega os treinamentos com a nova lógica de verificação
+        function loadTrainings() {
+            const container = document.getElementById('trainingContainer');
+            container.innerHTML = '<div class="loading-message"><i class="material-icons spin">hourglass_top</i><p>Carregando treinamentos...</p></div>';
+
+            // Primeiro obtém os dados do usuário
+            database.ref('users/' + currentUser.uid).once('value').then((userSnapshot) => {
+                const userData = userSnapshot.val();
+                const userPosition = userData ? userData.position : null;
+                const userUnit = userData ? userData.unidade : null;
+
+                if (!userPosition || !userUnit) {
+                    showNoTrainingsMessage(container, "Seu perfil não está completamente configurado. Entre em contato com o administrador.");
+                    return;
+                }
+
+                // Agora carrega os treinamentos e filtra
+                database.ref('trainings').orderByChild('status').equalTo('active').once('value')
+                    .then((trainingsSnapshot) => {
+                        const trainingsData = trainingsSnapshot.val();
+                        container.innerHTML = '';
+                        
+                        if (!trainingsData || Object.keys(trainingsData).length === 0) {
+                            showNoTrainingsMessage(container);
+                            return;
+                        }
+
+                        // Carrega a lista de funções por unidade
+                        database.ref('funcoes_por_unidade').once('value').then((functionsSnapshot) => {
+                            const functionsData = functionsSnapshot.val();
+                            let userFunctionData = null;
+
+                            // Encontra os dados da função do usuário
+                            if (functionsData) {
+                                for (const key in functionsData) {
+                                    if (functionsData[key].id === userPosition) {
+                                        userFunctionData = functionsData[key];
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!userFunctionData) {
+                                showNoTrainingsMessage(container, "Não foi possível identificar seu cargo. Entre em contato com o administrador.");
+                                return;
+                            }
+
+                            // Verifica se a unidade do usuário bate com a unidade da função
+                            if (userFunctionData.unidade !== userUnit) {
+                                showNoTrainingsMessage(container, "Sua unidade não corresponde à unidade do seu cargo. Entre em contato com o administrador.");
+                                return;
+                            }
+
+                            let hasTrainings = false;
+
+                            // Filtra os treinamentos
+                            Object.keys(trainingsData).forEach(trainingId => {
+                                const training = trainingsData[trainingId];
+                                
+                                // Verifica se o treinamento requer alguma função específica
+                                if (training.requiredFunctions && training.requiredFunctions.length > 0) {
+                                    // Verifica se o cargo do usuário está na lista de funções requeridas
+                                    if (training.requiredFunctions.includes(userPosition)) {
+                                        createTrainingCard(container, {
+                                            id: trainingId,
+                                            title: training.name,
+                                            description: training.description || 'Treinamento profissional',
+                                            image: training.coverImage || './img/default-training.jpg',
+                                            code: training.code || ''
+                                        });
+                                        hasTrainings = true;
+                                    }
+                                } else {
+                                    // Treinamento sem restrição de função - disponível para todos
+                                    createTrainingCard(container, {
+                                        id: trainingId,
+                                        title: training.name,
+                                        description: training.description || 'Treinamento profissional',
+                                        image: training.coverImage || './img/default-training.jpg',
+                                        code: training.code || ''
+                                    });
+                                    hasTrainings = true;
+                                }
+                            });
+
+                            if (!hasTrainings) {
+                                showNoTrainingsMessage(container, "Nenhum treinamento disponível para seu cargo no momento.");
+                            }
+                        }).catch((error) => {
+                            console.error("Erro ao carregar funções por unidade:", error);
+                            showErrorMessage(container);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao carregar treinamentos:", error);
+                        showErrorMessage(container);
+                    });
+            }).catch((error) => {
+                console.error("Erro ao carregar dados do usuário:", error);
+                showErrorMessage(container);
+            });
+        }
+
+        // Mostra mensagem quando não há treinamentos
+        function showNoTrainingsMessage(container, message = "Nenhum treinamento disponível no momento") {
+            container.innerHTML = `
+                <div class="empty-message">
+                    <i class="material-icons">info</i>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Mostra mensagem de erro
+        function showErrorMessage(container) {
+            container.innerHTML = `
+                <div class="error-message">
+                    <i class="material-icons">error</i>
+                    <p>Ocorreu um erro ao carregar os treinamentos</p>
+                    <button class="btn" onclick="loadTrainings()">Tentar novamente</button>
+                </div>
+            `;
+        }
+
+        // Cria um card de treinamento (com o botão no estilo original)
+        function createTrainingCard(container, training) {
+            const card = document.createElement('div');
+            card.className = 'training-card';
+            card.innerHTML = `
+                <img src="${training.image}" alt="${training.title}" 
+                     onerror="this.src='./img/default-training.jpg'">
+                <div class="training-card-content">
+                    <h3>${training.title} ${training.code ? '(' + training.code + ')' : ''}</h3>
+                    <p>${training.description}</p>
+                    <a class="btn" href="#" data-id="${training.id}">Iniciar Treinamento</a>
+                </div>
+            `;
+            
+            card.querySelector('.btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                startTraining(training.id);
+            });
+            
+            container.appendChild(card);
+        }
+
+        // Função para iniciar o treinamento (mantendo a lógica correta)
+        function startTraining(trainingId) {
+            const userTrainingRef = database.ref(`userTrainings/${currentUser.uid}/${trainingId}`);
+            
+            // Verifica se já existe progresso
+            userTrainingRef.once('value').then((snapshot) => {
+                const progress = snapshot.val();
+                
+                if (progress && progress.startedAt) {
+                    // Se já existe progresso, apenas redireciona
+                    window.location.href = `treinamento.html?id=${trainingId}`;
+                } else {
+                    // Se não existe, cria registro inicial
+                    userTrainingRef.set({
+                        startedAt: new Date().toISOString(),
+                        status: 'in_progress',
+                        lastAccess: new Date().toISOString()
+                    }).then(() => {
+                        window.location.href = `treinamento.html?id=${trainingId}`;
+                    });
+                }
+            }).catch((error) => {
+                console.error("Erro ao verificar progresso:", error);
+                window.location.href = `treinamento.html?id=${trainingId}`;
+            });
+        }
+
+        // Navegação do menu
+        document.getElementById('menuHome').addEventListener('click', () => {
+            window.location.href = 'home.html';
+        });
+
+        document.getElementById('menuProfile').addEventListener('click', () => {
+            window.location.href = 'perfil.html';
+        });
+        document.getElementById('menuISTs').addEventListener('click', () => {
+            window.location.href = 'home_ist.html';
+        });
+
+        document.getElementById('menuCompleted').addEventListener('click', () => {
+            window.location.href = 'concluidos.html';
+        });
+
+        document.getElementById('menuLogout').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error("Erro ao fazer logout:", error);
+            });
+        });
+
+        // Adiciona animação de spin
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .spin {
+                animation: spin 1.5s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

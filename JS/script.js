@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }).then(() => {
                             modal.style.display = 'none';
                             alert('Cadastro completo com sucesso!');
-                            window.location.href = 'home.html';
+                            window.location.href = 'src/home.html';
                         }).catch((error) => {
                             console.error("Erro ao salvar dados:", error);
                             alert("Erro ao salvar informações adicionais");
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                 } else {
                     // Usuário existente, apenas redireciona
-                    window.location.href = 'home.html';
+                    window.location.href = 'src/home.html';
                 }
             }).catch((error) => {
                 console.error("Erro no login com Google:", error);
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                window.location.href = 'home.html';
+                window.location.href = 'src/home.html';
             })
             .catch((error) => {
                 console.error("Erro no login:", error);
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     provider: 'email'
                 }).then(() => {
                     alert('Cadastro realizado com sucesso!');
-                    window.location.href = 'home.html';
+                    window.location.href = 'src/home.html';
                 }).catch((error) => {
                     console.error("Erro ao salvar dados:", error);
                     alert("Erro ao salvar informações: " + error.message);

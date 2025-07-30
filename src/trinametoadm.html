@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gerenciar Funcionários - GZL Treinamentos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="../CSS/admin.css" />
+    <style>
+        /* Estilos para os novos containers */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .action-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap; /* Adicionado para quebrar a linha se necessário */
+            margin-bottom: 30px;
+        }
+        .action-card {
+            flex: 1 1 200px; /* Flex-basis para quebrar a linha */
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .action-card i {
+            font-size: 48px;
+            color: #4285F4;
+            margin-bottom: 15px;
+        }
+        .action-card h3 {
+            margin: 0;
+            color: #333;
+        }
+        .action-card p {
+            color: #666;
+            margin: 10px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Lateral -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GZL Treinamentos</h2>
+            <p>Bem-vindo, <span id="userName"></span></p>
+        </div>
+        <ul class="sidebar-menu">
+            <li id="menuHome"><i class="material-icons">home</i> Home</li>
+            <li id="menuEmployees"><i class="material-icons">people</i> Funcionários</li>
+            <li class="active" id="menuTrainings"><i class="material-icons">school</i> Treinamentos</li>
+            <li id="menuProfile"><i class="material-icons">person</i> Perfil</li>
+            <li id="menuLogout"><i class="material-icons">logout</i> Sair</li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="action-container">
+            <!-- Container para Criar Funções -->
+            <div class="action-card" id="createFunctions">
+                <i class="material-icons">add_circle_outline</i>
+                <h3>Criar Funções</h3>
+                <p>Adicione novas funções/cargos para os funcionários</p>
+            </div>
+            <!-- Container para Criar Treinamentos -->
+            <div class="action-card" id="createTrainings">
+                <i class="material-icons">library_add</i>
+                <h3>Criar Treinamentos</h3>
+                <p>Cadastre novos treinamentos para sua equipe</p>
+            </div>
+            <!-- Novo container para criar IST -->
+            <div class="action-card" id="createIST">
+                <i class="material-icons">description</i>
+                <h3>Criar IST</h3>
+                <p>Configure uma nova instrução de trabalho (IST)</p>
+            </div>
+        </div>
+        <!-- Aqui pode vir seu restante de conteúdo -->
+    </div>
+
+    <!-- Firebase JS -->
+    <!-- Certifique-se de usar as versões compat se necessário para o seu código -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // Inicialize o Firebase (substitua com sua configuração)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEkkRm5s1QieOXz7rdxJEE_nTuOQAfm1Y",
+            authDomain: "gzltreinamentos.firebaseapp.com",
+            databaseURL: "https://gzltreinamentos-default-rtdb.firebaseio.com",
+            projectId: "gzltreinamentos",
+            storageBucket: "gzltreinamentos.appspot.com",
+            messagingSenderId: "991106826698",
+            appId: "1:991106826698:web:be17262818bdc0e04c4f33",
+            measurementId: "G-CG2PSQQ35G"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Monitora o estado de autenticação
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // Usuário está logado
+                document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+                // NÃO redireciona para index.html aqui.
+                // O usuário está logado, ele deve permanecer na página.
+            } else {
+                // Usuário NÃO está logado, redireciona para index
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Função auxiliar para verificar autenticação antes de redirecionar
+        function checkAuthAndRedirect(pageUrl) {
+             // Verifica se o usuário está logado antes de redirecionar
+             // A variável 'user' dentro do onAuthStateChanged pode não estar
+             // imediatamente disponível aqui. É mais seguro confiar no estado
+             // que onAuthStateChanged define, ou verificar auth.currentUser
+            if (auth.currentUser) {
+                window.location.href = pageUrl;
+            } else {
+                // Se não estiver logado, redireciona para login (embora onAuthStateChanged
+                // já devesse ter feito isso se a página foi carregada sem login)
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Navegação do menu - Atualizado para usar a função de verificação
+        document.getElementById('menuHome').addEventListener('click', (e) => {
+            e.preventDefault();
+            checkAuthAndRedirect('home.html');
+        });
+        
+        document.getElementById('menuEmployees').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'admin.html';
+        });
+
+        document.getElementById('menuTrainings').addEventListener('click', (e) => {
+            e.preventDefault();
+            checkAuthAndRedirect('trinametoadm.html');
+        });
+
+        document.getElementById('menuEmployees').addEventListener('click', (e) => {
+            e.preventDefault();
+            // Já estamos nesta página, apenas verifica se está logado.
+            // Se não estiver, o onAuthStateChanged já redirecionará.
+            if (!auth.currentUser) {
+                 window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('menuProfile').addEventListener('click', (e) => {
+            e.preventDefault();
+            checkAuthAndRedirect('perfiladm.html');
+        });
+
+        document.getElementById('menuLogout').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (auth && auth.currentUser) { // Verifica se auth existe e o usuário está logado
+                auth.signOut().then(() => {
+                    // Logout bem-sucedido. onAuthStateChanged detectará isso e redirecionará.
+                }).catch((error) => {
+                    console.error("Erro ao fazer logout:", error);
+                    // Em caso de erro no logout, ainda é prudente tentar redirecionar para login
+                    window.location.href = 'index.html';
+                });
+            } else {
+                 // Se já não estava autenticado, apenas redireciona para garantir
+                 window.location.href = 'index.html';
+            }
+        });
+
+        // Adicionando funcionalidade aos novos containers - Usando a função de verificação
+        document.getElementById('createFunctions').addEventListener('click', () => {
+            checkAuthAndRedirect('criar_funcoes.html'); // Substitua pelo seu URL real
+        });
+
+        document.getElementById('createTrainings').addEventListener('click', () => {
+            checkAuthAndRedirect('criartreinamneto.html'); // Substitua pelo seu URL real
+        });
+
+        // Adicionando funcionalidade para criar IST
+        document.getElementById('createIST').addEventListener('click', () => {
+             checkAuthAndRedirect('criarist.html'); // redireciona para criar IST
+        });
+
+    </script>
+</body>
+</html>
